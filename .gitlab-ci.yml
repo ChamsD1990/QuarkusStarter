@@ -1,0 +1,28 @@
+# Use a Docker image that matches your Quarkus Java version
+image: maven:3.9.6-eclipse-temurin-17
+
+# Cache Maven dependencies to make future builds faster
+cache:
+  paths:
+    - .m2/repository
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+pages:
+  stage: deploy
+  script:
+    # 1. Build the Quarkus application
+    - mvn clean package -DskipTests
+    
+    # 2. Create the required public folder
+    - mkdir public
+    
+    # 3. Copy your static web assets from Quarkus target to the public folder
+    # Adjust 'target/classes/meta-inf/resources' if your static files are generated elsewhere
+    - cp -r target/classes/META-INF/resources/* public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
