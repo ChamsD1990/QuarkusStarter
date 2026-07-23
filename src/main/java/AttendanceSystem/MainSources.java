@@ -12,7 +12,6 @@ import java.util.Map;
 @Path("/")
 public class MainSources {
 
-    // HANYA SATU method untuk root path
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response getRoot() {
@@ -81,11 +80,12 @@ public class MainSources {
     @Path("/health")
     @Produces(MediaType.APPLICATION_JSON)
     public Response health() {
-        Map<String, String> health = new HashMap<>();
+        Map<String, Object> health = new HashMap<>();
         health.put("status", "UP");
         health.put("service", "Attendance System");
         health.put("timestamp", java.time.LocalDateTime.now().toString());
 
+        // PASTIKAN menggunakan ResultResponse.success()
         return Response.ok(ResultResponse.success(health)).build();
     }
 
@@ -98,6 +98,7 @@ public class MainSources {
         apiInfo.put("version", "1.0.0");
         apiInfo.put("endpoints", getEndpoints());
 
+        // PASTIKAN menggunakan ResultResponse.success()
         return Response.ok(ResultResponse.success(apiInfo)).build();
     }
 

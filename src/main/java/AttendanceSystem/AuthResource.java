@@ -43,7 +43,7 @@ public class AuthResource {
             Map<String, Object> data = new HashMap<>();
             data.put("username", request.username);
             data.put("registeredAt", Instant.now().toString());
-            return Response.ok(ResultResponse.success(data, "User registered successfully")).build();
+            return Response.ok(ResultResponse.success("User registered successfully")).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(ResultResponse
@@ -79,7 +79,7 @@ public class AuthResource {
             // String token = jwtService.generateToken(request.username);
             // data.put("token", token);
 
-            return Response.ok(ResultResponse.success(data, "Login successful")).build();
+            return Response.ok(ResultResponse.success("Login successful")).build();
         } else {
             // Don't reveal if user exists or password is wrong (security best practice)
             return Response.status(Response.Status.UNAUTHORIZED)
@@ -94,7 +94,7 @@ public class AuthResource {
         // In production, invalidate JWT token or session
         Map<String, String> data = new HashMap<>();
         data.put("logoutTime", Instant.now().toString());
-        return Response.ok(ResultResponse.success(data, "Logout successful")).build();
+        return Response.ok(ResultResponse.success("Logout successful")).build();
     }
 
     @PUT
@@ -128,7 +128,7 @@ public class AuthResource {
             Map<String, Object> data = new HashMap<>();
             data.put("username", request.username);
             data.put("changedAt", Instant.now().toString());
-            return Response.ok(ResultResponse.success(data, "Password changed successfully")).build();
+            return Response.ok(ResultResponse.success("Password changed successfully")).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(ResultResponse
@@ -157,7 +157,7 @@ public class AuthResource {
         data.put("createdAt", authService.getUserCreatedAt(username));
         data.put("exists", true);
 
-        return Response.ok(ResultResponse.success(data, "User found")).build();
+        return Response.ok(ResultResponse.success("User found")).build();
     }
 
     // Admin endpoints
@@ -171,7 +171,7 @@ public class AuthResource {
             Map<String, Object> data = new HashMap<>();
             data.put("username", username);
             data.put("unlockedAt", Instant.now().toString());
-            return Response.ok(ResultResponse.success(data, "Account unlocked successfully")).build();
+            return Response.ok(ResultResponse.success("Account unlocked successfully")).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity(ResultResponse.error("User not found or account not locked"))
@@ -189,7 +189,7 @@ public class AuthResource {
             Map<String, Object> data = new HashMap<>();
             data.put("username", username);
             data.put("deletedAt", Instant.now().toString());
-            return Response.ok(ResultResponse.success(data, "data success")).build();
+            return Response.ok(ResultResponse.success("data success")).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity(ResultResponse.error("User not found"))
@@ -213,7 +213,7 @@ public class AuthResource {
         authService.clearDatabase();
         Map<String, Object> data = new HashMap<>();
         data.put("clearedAt", Instant.now().toString());
-        return Response.ok(ResultResponse.success(data, "Database cleared successfully")).build();
+        return Response.ok(ResultResponse.success("Database cleared successfully")).build();
     }
 }
 
