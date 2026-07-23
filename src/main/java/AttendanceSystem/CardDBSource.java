@@ -3,7 +3,7 @@ package AttendanceSystem;
 import AttendanceSystem.Model.CardDB;
 import AttendanceSystem.Model.ResultResponse;
 import AttendanceSystem.Service.CardService;
-import jakarta.inject.Inject; 
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -11,19 +11,18 @@ import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
 import java.io.IOException;
-import java.nio.file.Files; 
-import java.util.Base64;
+import java.nio.file.Files;
 import java.util.List;
 
-@Path("/cards")
+@Path("/cards") // ← MUST HAVE THIS
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class CardDBSource {
 
     @Inject
     CardService cardService;
 
-    
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getAllCards(@QueryParam("id") String id) {
         try {
             List<CardDB> cards = cardService.getAllCard(id);
@@ -35,7 +34,6 @@ public class CardDBSource {
             }
 
             return Response.ok(ResultResponse.success(cards)).build();
-
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(ResultResponse.error("Error: " + e.getMessage()))
@@ -45,7 +43,6 @@ public class CardDBSource {
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getCardById(@PathParam("id") String id) {
         try {
             CardDB card = cardService.getCardById(id);
@@ -57,17 +54,15 @@ public class CardDBSource {
             }
 
             return Response.ok(ResultResponse.success(card)).build();
-
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(ResultResponse.error("Error: " + e.getMessage()))
                     .build();
         }
     }
- 
+
     @GET
     @Path("/search")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response searchCards(@QueryParam("cardNo") String cardNo) {
         try {
             List<CardDB> cards = cardService.searchCardsByCardNo(cardNo);
@@ -79,17 +74,14 @@ public class CardDBSource {
             }
 
             return Response.ok(ResultResponse.success(cards)).build();
-
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(ResultResponse.error("Error: " + e.getMessage()))
                     .build();
         }
     }
- 
+
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response insertCard(CardDB card) {
         try {
             boolean success = cardService.insertCard(card);
@@ -103,18 +95,15 @@ public class CardDBSource {
                         .entity(ResultResponse.error("Failed to create card"))
                         .build();
             }
-
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(ResultResponse.error("Error: " + e.getMessage()))
                     .build();
         }
     }
- 
+
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response updateCard(@PathParam("id") String id, CardDB card) {
         try {
             card.setID(id);
@@ -127,7 +116,6 @@ public class CardDBSource {
                         .entity(ResultResponse.error("Card not found: " + id))
                         .build();
             }
-
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(ResultResponse.error("Error: " + e.getMessage()))
@@ -137,7 +125,6 @@ public class CardDBSource {
 
     @DELETE
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteCard(@PathParam("id") String id) {
         try {
             boolean success = cardService.deleteCard(id);
@@ -149,7 +136,6 @@ public class CardDBSource {
                         .entity(ResultResponse.error("Card not found: " + id))
                         .build();
             }
-
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(ResultResponse.error("Error: " + e.getMessage()))
@@ -160,7 +146,6 @@ public class CardDBSource {
     @POST
     @Path("/{id}/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response uploadImage(@PathParam("id") String id, @RestForm("file") FileUpload fileUpload) {
         try {
             if (fileUpload == null || fileUpload.fileName() == null || fileUpload.fileName().isEmpty()) {
@@ -168,7 +153,7 @@ public class CardDBSource {
                         .entity(ResultResponse.error("File is required"))
                         .build();
             }
- 
+
             java.nio.file.Path uploadedFile = fileUpload.uploadedFile();
             byte[] imageData = Files.readAllBytes(uploadedFile);
 
@@ -182,7 +167,6 @@ public class CardDBSource {
                         .entity(ResultResponse.error("Failed to upload image"))
                         .build();
             }
-
         } catch (IOException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(ResultResponse.error("Error reading file: " + e.getMessage()))
@@ -209,14 +193,13 @@ public class CardDBSource {
 
             String mediaType = detectImageType(imageData);
             return Response.ok(imageData, mediaType).build();
-
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error: " + e.getMessage())
                     .build();
         }
     }
- 
+
     private String detectImageType(byte[] imageData) {
         if (imageData.length < 4)
             return "application/octet-stream";
