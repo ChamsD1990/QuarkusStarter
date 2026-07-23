@@ -1,0 +1,244 @@
+package AttendanceSystem;
+
+import AttendanceSystem.Model.SessionData;
+import AttendanceSystem.Service.helper.DedicatedIP;
+import AttendanceSystem.Service.helper.JwtService;
+import AttendanceSystem.Service.helper.RandomStringGenerator;
+import io.quarkus.runtime.StartupEvent;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.NewCookie;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+@Path("/")
+@ApplicationScoped
+public class MainSources {
+
+    @Inject
+    JwtService jwtService;
+
+    @Inject
+    DedicatedIP dedicatedIP;
+
+    @Inject
+    RandomStringGenerator randomGenerator;
+
+    @Inject
+    HtmlReaderService htmlReaderService;
+
+    @ConfigProperty(name = "quarkus.http.host", defaultValue = "0.0.0.0")
+    String serverHost;
+
+    @ConfigProperty(name = "quarkus.http.port", defaultValue = "8080")
+    int serverPort;
+
+    private String serverIP;
+
+    // ============ SESSION TRACKING ============
+    private final Map<String, SessionData> sessions = new HashMap<>();
+    
+    // ============ CSRF TOKEN STORAGE ============
+    // Map untuk menyimpan CSRF token yang valid
+    // Key: sessionId, Value: csrfToken
+    private final Map<String, String> validCSRFTokens = new HashMap<>();
+    
+    private static final int MAX_REQUESTS_PER_MINUTE = 60;
+
+    // ============================================================
+    // VALIDATE SESSION ENDPOINT
+    // ============================================================
+    @POST
+    @Path("/api/validate-session")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response validateSession(
+        @HeaderParam("Authorization") String auth,
+        @HeaderParam("X-CSRF-Token") String csrfToken,
+        Map<String, String> body,
+        @Context HttpHeaders headers
+    ) {
+        String clientIp = dedicatedIP.getClientIp(headers);
+        
+        boolean valid = false;
+        String message = "Invalid session";
+        
+        // 1. Validate JWT Token
+        if (auth != null && auth.startsWith("Bearer ")) {
+            String jwt = auth.substring(7);
+            if (jwtService.validateToken(jwt, clientIp)) {
+                valid = true;
+                message = "Session validated";
+            }
+        }
+        
+        // 2. Validate CSRF Token - CHECK AGAINST STORED TOKENS
+        if (csrfToken != null && validCSRFTokens.containsValue(csrfToken)) {
+            valid = true;
+            message = "CSRF token validated";
+        }
+        
+        // 3. Validate Anti-Scrape Token
+        String antiScrapeToken = body != null ? body.get("token") : null;
+        if (antiScrapeToken != null && jwtService.validateScrapeToken(antiScrapeToken, clientIp)) {
+            valid = true;
+            message = "Anti-scrape token validated";
+        }
+        
+        String response = String.format(
+            "{\"valid\": %b, \"message\": \"%s\", \"ip\": \"%s\"}",
+            valid, message, clientIp
+        );
+        
+        return Response.ok(response)
+            .header("Cache-Control", "no-cache")
+            .build();
+    }
+
+    // ============================================================
+    // STARTUP LISTENER
+    // ============================================================
+    void onStart(@Observes StartupEvent event) {
+        this.serverIP = dedicatedIP.getPublicIPv4();
+        printBanner();
+    }
+
+    private void printBanner() {
+        System.out.println("\n" +
+                "╔══════════════════════════════════════════════════════════════════╗\n" +
+                "║                   🔒 SECURE ATTENDANCE SYSTEM                   ║\n" +
+                "╠══════════════════════════════════════════════════════════════════╣\n" +
+                "║  ✅ Server: http://" + serverIP + ":" + serverPort + "                                      ║\n" +
+                "║  🔐 Security: JWT + Rate Limiting + IP Protection              ║\n" +
+                "╚══════════════════════════════════════════════════════════════════╝\n");
+    }
+
+    // ============================================================
+    // MAIN ENDPOINT
+    // ============================================================
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response getRoot(@Context HttpHeaders headers) {
+        // 1. GET CLIENT IP
+        String clientIp = dedicatedIP.getClientIp(headers);
+        System.out.println("📡 Client IP: " + clientIp);
+
+        // 2. CHECK BLOCKED IP
+        if (dedicatedIP.isBlocked(clientIp)) {
+            return Response.status(403)
+                    .entity("<h1>⛔ Access Denied - Your IP is Blocked</h1>")
+                    .build();
+        }
+
+        // 3. RATE LIMITING
+        if (isRateLimited(clientIp)) {
+            return Response.status(429)
+                    .entity("<h1>⏳ Too Many Requests - Please wait 60 seconds</h1>")
+                    .header("Retry-After", "60")
+                    .build();
+        }
+
+        // 4. GENERATE SECURE TOKENS
+        String sessionId = UUID.randomUUID().toString().replace("-", "");
+        String jwtToken = jwtService.generateToken(sessionId, "user", clientIp);
+        String csrfToken = jwtService.generateCsrfToken();
+        String antiScrapeToken = jwtService.generateScrapeToken(clientIp);
+        
+        // 5. STORE CSRF TOKEN FOR VALIDATION
+        validCSRFTokens.put(sessionId, csrfToken);
+        System.out.println("🔑 CSRF Token stored for session: " + sessionId);
+
+        // 6. READ HTML
+        String html = htmlReaderService.readHtml();
+
+        // 7. INJECT SECURE DATA
+        String secureHtml = html
+                .replace("<!-- SESSION_ID -->", sessionId)
+                .replace("<!-- JWT_TOKEN -->", jwtToken)
+                .replace("<!-- CSRF_TOKEN -->", csrfToken)
+                .replace("<!-- ANTI_SCRAPE_TOKEN -->", antiScrapeToken)
+                .replace("<!-- CLIENT_IP -->", clientIp)
+                .replace("<!-- TIMESTAMP -->", String.valueOf(Instant.now().getEpochSecond()));
+
+        // 8. ADD SECURITY HEADERS
+        return Response.ok(secureHtml)
+                .cookie(new NewCookie("jwt_token", jwtToken, "/", null, null, 3600, true))
+                .cookie(new NewCookie("session_id", sessionId, "/", null, null, 3600, true))
+                .cookie(new NewCookie("csrf_token", csrfToken, "/", null, null, 3600, true))
+                .header("X-Content-Type-Options", "nosniff")
+                .header("X-Frame-Options", "DENY")
+                .header("X-XSS-Protection", "1; mode=block")
+                .header("Referrer-Policy", "no-referrer")
+                .header("Content-Security-Policy",
+                        "default-src 'self'; " +
+                        "script-src 'self' 'unsafe-inline' https:; " +
+                        "style-src 'self' 'unsafe-inline'; " +
+                        "img-src 'self' data:; " +
+                        "font-src 'self'; " +
+                        "connect-src 'self'")
+                .header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                .header("Pragma", "no-cache")
+                .build();
+    }
+
+    // ============================================================
+    // RATE LIMITING
+    // ============================================================
+    private boolean isRateLimited(String ip) {
+        String key = ip;
+        SessionData data = sessions.get(key);
+        long now = System.currentTimeMillis();
+
+        if (data == null || (now - data.getLastRequest()) > 60000) {
+            sessions.put(key, new SessionData(1, now));
+            return false;
+        }
+
+        if (data.getRequestCount() >= MAX_REQUESTS_PER_MINUTE) {
+            return true;
+        }
+
+        data.setRequestCount(data.getRequestCount() + 1);
+        data.setLastRequest(now);
+        return false;
+    }
+
+    // ============================================================
+    // HTML READER SERVICE (INNER CLASS)
+    // ============================================================
+    @ApplicationScoped
+    public static class HtmlReaderService {
+
+        public String readHtml() {
+            try (InputStream is = getClass().getClassLoader()
+                    .getResourceAsStream("templates/dashboard.html")) {
+
+                if (is == null) {
+                    return "<h1>File templates/dashboard.html tidak ditemukan!</h1>";
+                }
+
+                return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "<h1>Error: " + e.getMessage() + "</h1>";
+            }
+        }
+    }
+}

@@ -10,7 +10,9 @@
   <properties>
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <quarkus.platform.version>3.6.0</quarkus.platform.version>
+    <quarkus.platform.version>3.6.0</quarkus.platform.version> 
+    <quarkus.http.host>0.0.0.0</quarkus.http.host>
+    <quarkus.http.port>8080</quarkus.http.port>
   </properties>
   
   <dependencyManagement>

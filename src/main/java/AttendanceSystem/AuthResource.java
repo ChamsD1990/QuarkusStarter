@@ -2,6 +2,7 @@ package AttendanceSystem;
 
 import AttendanceSystem.Model.ResultResponse;
 import AttendanceSystem.Service.*;
+import AttendanceSystem.Service.helper.JwtService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
