@@ -1,8 +1,8 @@
-package AttendanceSystem;
+package AttendanceSystem.Pages;
 
 import AttendanceSystem.Model.ResultResponse;
 import AttendanceSystem.Service.*;
-import AttendanceSystem.Service.helper.JwtService;
+import AttendanceSystem.Service.helper.JwtService; 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -218,7 +218,8 @@ public class AuthResource {
     }
 }
 
-// Request DTOs
+
+
 class RegistrationRequest {
     public String username;
     public String password;

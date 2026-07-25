@@ -12,7 +12,6 @@ import java.util.Map;
 @Path("/dashboard")
 public class Dashboard {
 
-    // ============ WEB ENDPOINT (HTML) ============
     @GET
     @Produces(MediaType.TEXT_HTML)
     public String getDashboardWeb() {
@@ -61,7 +60,7 @@ public class Dashboard {
                         "absentToday", 30));
     }
 
-    // ============ API ENDPOINT (JSON) ============
+    
     @GET
     @Path("/api")
     @Produces(MediaType.APPLICATION_JSON)
