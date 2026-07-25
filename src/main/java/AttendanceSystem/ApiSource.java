@@ -1,26 +1,75 @@
-package AttendanceSystem.Pages;
+package AttendanceSystem;
 
-import AttendanceSystem.Model.ResultResponse;
+import AttendanceSystem.Model.*;
+import AttendanceSystem.Model.Auth.*;
 import AttendanceSystem.Service.*;
+import AttendanceSystem.Service.helper.DedicatedIP;
 import AttendanceSystem.Service.helper.JwtService; 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
+ 
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-@Path("/api/auth")
+@Path("/api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class AuthResource {
+public class ApiSource {
+    @Inject
+    DedicatedIP dedicatedIP; 
 
     @Inject
     AuthDataSecure authService;
 
     @Inject
-    JwtService jwtService; // Optional - if you want JWT tokens
+    JwtService jwtService; 
+    private final Map<String, String> validCSRFTokens = new HashMap<>();
+
+  @POST
+  @Path("/validate-session")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response validateSession(
+        @HeaderParam("Authorization") String auth,
+        @HeaderParam("X-CSRF-Token") String csrfToken,
+        Map<String, String> body,
+        @Context HttpHeaders headers
+  ) {
+    String clientIp = dedicatedIP.getClientIp(headers);
+        
+        boolean valid = false;
+        String message = "Invalid session";
+         
+        if (auth != null && auth.startsWith("Bearer ")) {
+            String jwt = auth.substring(7);
+            if (jwtService.validateToken(jwt, clientIp)) {
+                valid = true;
+                message = "Session validated";
+            }
+        }
+         
+        if (csrfToken != null && validCSRFTokens.containsValue(csrfToken)) {
+            valid = true;
+            message = "CSRF token validated";
+        }
+         
+        String antiScrapeToken = body != null ? body.get("token") : null;
+        if (antiScrapeToken != null && jwtService.validateScrapeToken(antiScrapeToken, clientIp)) {
+            valid = true;
+            message = "Anti-scrape token validated";
+        }
+        
+        String response = String.format(
+            "{\"valid\": %b, \"message\": \"%s\", \"ip\": \"%s\"}",
+            valid, message, clientIp
+        );
+        
+        return Response.ok(response)
+            .header("Cache-Control", "no-cache")
+            .build();
+    }
+ 
 
     @POST
     @Path("/register")
@@ -55,8 +104,7 @@ public class AuthResource {
 
     @POST
     @Path("/login")
-    public Response login(LoginRequest request) {
-        // Validate input
+    public Response login(LoginRequest request) { 
         if (request.username == null || request.username.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(ResultResponse.error("Username cannot be empty"))
@@ -76,7 +124,6 @@ public class AuthResource {
             data.put("username", request.username);
             data.put("loginTime", Instant.now().toString());
 
-            // Optional: Generate JWT token
             // String token = jwtService.generateToken(request.username);
             // data.put("token", token);
 
@@ -220,18 +267,7 @@ public class AuthResource {
 
 
 
-class RegistrationRequest {
-    public String username;
-    public String password;
-}
 
-class LoginRequest {
-    public String username;
-    public String password;
-}
 
-class ChangePasswordRequest {
-    public String username;
-    public String oldPassword;
-    public String newPassword;
-}
+
+

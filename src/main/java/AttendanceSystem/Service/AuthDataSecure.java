@@ -22,8 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AuthDataSecure {
 
     private static final Logger LOG = Logger.getLogger(AuthDataSecure.class);
-
-    // HAPUS baris ini
+ 
     // @Inject
     // SecurityIdentity securityIdentity;
 

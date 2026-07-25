@@ -46,8 +46,7 @@ public class MainSources {
     public Boolean hasActiveSession = false;
     private String serverIP;
     public String currentSessionId;
-    private final Map<String, SessionData> sessions = new HashMap<>();
-    private final Map<String, String> validCSRFTokens = new HashMap<>();
+    private final Map<String, SessionData> sessions = new HashMap<>(); 
     private static final int MAX_REQUESTS_PER_MINUTE = 60;
     
     void onStart(@Observes StartupEvent event) {
@@ -129,49 +128,7 @@ public class MainSources {
         return false;
     }
     
-    @POST
-    @Path("/api/validate-session")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response validateSession(
-        @HeaderParam("Authorization") String auth,
-        @HeaderParam("X-CSRF-Token") String csrfToken,
-        Map<String, String> body,
-        @Context HttpHeaders headers
-    ) {
-        String clientIp = dedicatedIP.getClientIp(headers);
-        
-        boolean valid = false;
-        String message = "Invalid session";
-         
-        if (auth != null && auth.startsWith("Bearer ")) {
-            String jwt = auth.substring(7);
-            if (jwtService.validateToken(jwt, clientIp)) {
-                valid = true;
-                message = "Session validated";
-            }
-        }
-         
-        if (csrfToken != null && validCSRFTokens.containsValue(csrfToken)) {
-            valid = true;
-            message = "CSRF token validated";
-        }
-         
-        String antiScrapeToken = body != null ? body.get("token") : null;
-        if (antiScrapeToken != null && jwtService.validateScrapeToken(antiScrapeToken, clientIp)) {
-            valid = true;
-            message = "Anti-scrape token validated";
-        }
-        
-        String response = String.format(
-            "{\"valid\": %b, \"message\": \"%s\", \"ip\": \"%s\"}",
-            valid, message, clientIp
-        );
-        
-        return Response.ok(response)
-            .header("Cache-Control", "no-cache")
-            .build();
-    }
- 
+
 
   @GET
   @Produces(MediaType.TEXT_HTML)
