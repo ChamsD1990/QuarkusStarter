@@ -34,13 +34,24 @@ public class SQLiteHelper {
 
     // Create required tables
     private static void createTables() {
+        String createUsersTable = """
+                CREATE TABLE IF NOT EXISTS users (
+                    username TEXT PRIMARY KEY,
+                    salt TEXT NOT NULL,
+                    hashed_password TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    is_locked INTEGER DEFAULT 0,
+                    locked_until TEXT
+                );
+                """;
         String sessionTable = """
             CREATE TABLE IF NOT EXISTS sessionData (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL,
                 password TEXT NOT NULL,
                 session_created TEXT NOT NULL,
-                session_cleared TEXT NOT NULL
+                session_cleared TEXT NOT NULL,
+                session_expired TEXT NOT NULL
             );
           """;
         String createAttendanceTable = """
@@ -65,7 +76,8 @@ public class SQLiteHelper {
                     );
                 """;
 
-        try (Statement stmt = connection.createStatement()) {
+        try (Statement stmt = connection.createStatement()) { 
+            stmt.execute(createUsersTable);
             stmt.execute(createAttendanceTable);
             stmt.execute(createEmployeeTable);
             stmt.execute(sessionTable);

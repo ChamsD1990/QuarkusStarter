@@ -4,20 +4,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <!-- Load-->
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    <title>Attendance System</title>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #1a237e;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .header .subtitle strong {
+            color: #1a237e;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card .icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stat-card.primary .number {
+            color: #1976d2;
+        }
+
+        .stat-card.success .number {
+            color: #388e3c;
+        }
+
+        .stat-card.warning .number {
+            color: #f57c00;
+        }
+
+        .stat-card.danger .number {
+            color: #d32f2f;
+        }
+
+        .stat-card.info .number {
+            color: #0097a7;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .activity-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item .time {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge-login {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .badge-logout {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .badge-attendance {
+            background: #e1f5fe;
+            color: #0097a7;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quick-actions a {
+            display: block;
+            padding: 14px;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .quick-actions a:hover {
+            transform: scale(1.02);
+        }
+
+        .btn-primary {
+            background: #1976d2;
+            color: white;
+        }
+
+        .btn-success {
+            background: #388e3c;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f57c00;
+            color: white;
+        }
+
+        .btn-info {
+            background: #0097a7;
+            color: white;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: white;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <h2>TEST</h2>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 {title}</h1>
+            <div class="subtitle">
+                Welcome back, <strong>{username}</strong>! Last login: {lastLogin}
+            </div>
+        </div>
 
-    <h1>Attendance System</h1>
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="icon">👥</div>
+                <div class="number">{totalEmployees}</div>
+                <div class="label">Total Employees</div>
+            </div>
+            <div class="stat-card success">
+                <div class="icon">✅</div>
+                <div class="number">{presentToday}</div>
+                <div class="label">Present Today</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="icon">❌</div>
+                <div class="number">{absentToday}</div>
+                <div class="label">Absent Today</div>
+            </div>
+            <div class="stat-card info">
+                <div class="icon">📈</div>
+                <div class="number">{attendanceRate}%</div>
+                <div class="label">Attendance Rate</div>
+            </div>
+        </div>
 
-    <a href="/health">Health Check</a>
+        <!-- Main Content -->
+        <div class="content-grid">
+            <!-- Recent Activities -->
+            <div class="card">
+                <h3>📋 Recent Activities</h3>
+                {#if recentActivities}
+                {#for activity in recentActivities}
+                <div class="activity-item">
+                    <span>
+                        <span class="badge badge-{activity.type}">{activity.action}</span>
+                        {activity.user}
+                    </span>
+                    <span class="time">{activity.time}</span>
+                </div>
+                {/for}
+                {#else}
+                <p style="color: #999; text-align: center; padding: 20px;">No recent activities</p>
+                {/if}
+            </div>
 
+            <!-- Quick Actions -->
+            <div class="card">
+                <h3>⚡ Quick Actions</h3>
+                <div class="quick-actions">
+                    <a href="/attendance/mark" class="btn-primary">✅ Mark Attendance</a>
+                    <a href="/employees" class="btn-success">👥 View Employees</a>
+                    <a href="/reports" class="btn-warning">📊 Generate Report</a>
+                    <a href="/settings" class="btn-info">⚙️ Settings</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            © {currentYear} Attendance System v{version} | Server Time: {serverTime}
+        </div>
+    </div>
 </body>
 
 </html>

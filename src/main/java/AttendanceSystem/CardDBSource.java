@@ -7,14 +7,17 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.jboss.resteasy.reactive.RestForm;
-import org.jboss.resteasy.reactive.multipart.FileUpload;
+import jakarta.ws.rs.FormParam; // ← TAMBAHKAN INI!
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-@Path("/cards") // ← MUST HAVE THIS
+import org.jboss.resteasy.reactive.MultipartForm;
+import org.jboss.resteasy.reactive.PartType;
+ 
+
+@Path("/cards")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class CardDBSource {
@@ -146,36 +149,44 @@ public class CardDBSource {
     @POST
     @Path("/{id}/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadImage(@PathParam("id") String id, @RestForm("file") FileUpload fileUpload) {
+    public Response uploadImage(
+            @PathParam("id") String id,
+            @MultipartForm FileUploadForm form) {
         try {
-            if (fileUpload == null || fileUpload.fileName() == null || fileUpload.fileName().isEmpty()) {
+            if (form == null || form.fileData == null || form.fileData.length == 0) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity(ResultResponse.error("File is required"))
                         .build();
             }
 
-            java.nio.file.Path uploadedFile = fileUpload.uploadedFile();
-            byte[] imageData = Files.readAllBytes(uploadedFile);
-
-            boolean success = cardService.uploadImage(id, imageData);
+            boolean success = cardService.uploadImage(id, form.fileData);
 
             if (success) {
-                return Response.ok(ResultResponse.success("Image uploaded successfully: " + fileUpload.fileName()))
+                return Response.ok(ResultResponse.success("Image uploaded successfully: " + form.fileName))
                         .build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity(ResultResponse.error("Failed to upload image"))
                         .build();
             }
-        } catch (IOException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(ResultResponse.error("Error reading file: " + e.getMessage()))
-                    .build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(ResultResponse.error("Error: " + e.getMessage()))
                     .build();
         }
+    }
+
+    // Form class for multipart upload
+    public static class FileUploadForm {
+        @FormParam("file")
+        @PartType(MediaType.APPLICATION_OCTET_STREAM)
+        public byte[] fileData;
+
+        @FormParam("fileName")
+        public String fileName;
+
+        @FormParam("fileType")
+        public String fileType;
     }
 
     @GET

@@ -4,11 +4,11 @@ import AttendanceSystem.Model.*;
 import AttendanceSystem.Model.Auth.*;
 import AttendanceSystem.Service.*;
 import AttendanceSystem.Service.helper.DedicatedIP;
-import AttendanceSystem.Service.helper.JwtService; 
+import AttendanceSystem.Service.helper.JwtService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
- 
+
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,29 +18,58 @@ import java.util.Map;
 @Consumes(MediaType.APPLICATION_JSON)
 public class ApiSource {
     @Inject
-    DedicatedIP dedicatedIP; 
+    DedicatedIP dedicatedIP;
 
     @Inject
     AuthDataSecure authService;
 
     @Inject
-    JwtService jwtService; 
+    JwtService jwtService;
     private final Map<String, String> validCSRFTokens = new HashMap<>();
 
-  @POST
-  @Path("/validate-session")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response validateSession(
-        @HeaderParam("Authorization") String auth,
-        @HeaderParam("X-CSRF-Token") String csrfToken,
-        Map<String, String> body,
-        @Context HttpHeaders headers
-  ) {
-    String clientIp = dedicatedIP.getClientIp(headers);
-        
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getApiInfo() {
+        Map<String, Object> apiInfo = new HashMap<>();
+        apiInfo.put("name", "Attendance System API");
+        apiInfo.put("version", "1.0.0");
+        apiInfo.put("status", "running");
+        apiInfo.put("timestamp", Instant.now().toString());
+
+        Map<String, String> endpoints = new HashMap<>();
+        endpoints.put("POST /api/validate-session", "Validate session with JWT, CSRF, and anti-scrape tokens");
+        endpoints.put("POST /api/register", "Register a new user");
+        endpoints.put("POST /api/login", "Login user");
+        endpoints.put("POST /api/logout", "Logout user");
+        endpoints.put("PUT /api/change-password", "Change user password");
+        endpoints.put("GET /api/user/{username}", "Get user information");
+        endpoints.put("POST /api/admin/unlock/{username}", "Unlock user account (admin)");
+        endpoints.put("DELETE /api/admin/user/{username}", "Delete user (admin)");
+        endpoints.put("GET /api/admin/users/count", "Get total user count (admin)");
+        endpoints.put("POST /api/admin/clear", "Clear database (admin)");
+        apiInfo.put("endpoints", endpoints);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("data", apiInfo);
+        response.put("message", null);
+
+        return Response.ok(response).build();
+    }
+
+    @POST
+    @Path("/validate-session")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response validateSession(
+            @HeaderParam("Authorization") String auth,
+            @HeaderParam("X-CSRF-Token") String csrfToken,
+            Map<String, String> body,
+            @Context HttpHeaders headers) {
+        String clientIp = dedicatedIP.getClientIp(headers);
+
         boolean valid = false;
         String message = "Invalid session";
-         
+
         if (auth != null && auth.startsWith("Bearer ")) {
             String jwt = auth.substring(7);
             if (jwtService.validateToken(jwt, clientIp)) {
@@ -48,28 +77,26 @@ public class ApiSource {
                 message = "Session validated";
             }
         }
-         
+
         if (csrfToken != null && validCSRFTokens.containsValue(csrfToken)) {
             valid = true;
             message = "CSRF token validated";
         }
-         
+
         String antiScrapeToken = body != null ? body.get("token") : null;
         if (antiScrapeToken != null && jwtService.validateScrapeToken(antiScrapeToken, clientIp)) {
             valid = true;
             message = "Anti-scrape token validated";
         }
-        
+
         String response = String.format(
-            "{\"valid\": %b, \"message\": \"%s\", \"ip\": \"%s\"}",
-            valid, message, clientIp
-        );
-        
+                "{\"valid\": %b, \"message\": \"%s\", \"ip\": \"%s\"}",
+                valid, message, clientIp);
+
         return Response.ok(response)
-            .header("Cache-Control", "no-cache")
-            .build();
+                .header("Cache-Control", "no-cache")
+                .build();
     }
- 
 
     @POST
     @Path("/register")
@@ -104,7 +131,7 @@ public class ApiSource {
 
     @POST
     @Path("/login")
-    public Response login(LoginRequest request) { 
+    public Response login(LoginRequest request) {
         if (request.username == null || request.username.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(ResultResponse.error("Username cannot be empty"))
@@ -257,17 +284,10 @@ public class ApiSource {
 
     @POST
     @Path("/admin/clear")
-    public Response clearDatabase() { 
+    public Response clearDatabase() {
         authService.clearDatabase();
         Map<String, Object> data = new HashMap<>();
         data.put("clearedAt", Instant.now().toString());
         return Response.ok(ResultResponse.success("Database cleared successfully")).build();
     }
 }
-
-
-
-
-
-
-

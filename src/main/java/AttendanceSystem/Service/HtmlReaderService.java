@@ -7,9 +7,9 @@ import java.nio.charset.StandardCharsets;
 @ApplicationScoped
 public class HtmlReaderService {
 
-    public String readHtml() {
+    public String readHtml(String names) {
         try (InputStream is = getClass().getClassLoader()
-                .getResourceAsStream("templates/dashboard.html")) {
+                .getResourceAsStream("templates/"+names)) {
 
             if (is == null) {
                 return "<h1>File templates/dashboard.html tidak ditemukan!</h1>";

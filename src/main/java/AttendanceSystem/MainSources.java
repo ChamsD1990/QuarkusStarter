@@ -21,22 +21,22 @@ import java.net.URI;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-
+import org.json.JSONObject;
 
 @Path("/")
 public class MainSources {
     @Inject
-    DedicatedIP dedicatedIP; 
+    DedicatedIP dedicatedIP;
 
     @Inject
     JwtService jwtService;
-    
-    private final HtmlReaderService htmlReaderService = new HtmlReaderService();
+
 
     @ConfigProperty(name = "quarkus.http.host", defaultValue = "0.0.0.0")
     String serverHost;
@@ -46,16 +46,18 @@ public class MainSources {
     public Boolean hasActiveSession = false;
     private String serverIP;
     public String currentSessionId;
-    private final Map<String, SessionData> sessions = new HashMap<>(); 
+    private final Map<String, SessionData> sessions = new HashMap<>();
     private static final int MAX_REQUESTS_PER_MINUTE = 60;
-    
+
+    private String cachedSessionJson = null;
+
     void onStart(@Observes StartupEvent event) {
         this.serverIP = dedicatedIP.getPublicIPv4();
         printBanner();
         SQLiteHelper.main(null);
         checkExistingSession();
     }
-    
+
     private void printBanner() {
         System.out.println("\n" +
                 "╔══════════════════════════════════════════════════════════════════ ╗\n" +
@@ -65,49 +67,75 @@ public class MainSources {
                 "║  🔐 Security: JWT + Rate Limiting + IP Protection                ║\n" +
                 "╚══════════════════════════════════════════════════════════════════╝\n");
     }
- 
-    private void checkExistingSession() { 
+
+    private void checkExistingSession() {
         try {
             Connection conn = SQLiteHelper.getConnection();
-            
+
             if (conn == null) {
                 System.err.println("❌ Database connection failed!");
                 hasActiveSession = false;
+                cachedSessionJson = null;
                 return;
             }
-            
+
             Statement stmt = conn.createStatement();
-            String query = "SELECT * FROM sessions ORDER BY created_at DESC LIMIT 1";
+            String query = "SELECT * FROM sessionData ORDER BY session_created DESC LIMIT 1";
             ResultSet rs = stmt.executeQuery(query);
-            
+
             if (rs.next()) {
-                // ✅ Session exists
-                currentSessionId = rs.getString("session_id");
-                String userId = rs.getString("user_id");
-                String createdAt = rs.getString("created_at");
-                
-                System.out.println("✅ Active session found:");
-                System.out.println("   Session ID: " + currentSessionId);
-                System.out.println("   User ID: " + userId);
-                System.out.println("   Created: " + createdAt);
-                
+                JSONObject jsonObject = new JSONObject();
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = metaData.getColumnName(i);
+                    Object value = rs.getObject(i);
+
+                    if (value instanceof java.sql.Timestamp) {
+                        jsonObject.put(columnName, value.toString());
+                    } else if (value instanceof java.sql.Date) {
+                        jsonObject.put(columnName, value.toString());
+                    } else {
+                        jsonObject.put(columnName, value);
+                    }
+                }
+
+                cachedSessionJson = jsonObject.toString();
                 hasActiveSession = true;
-            } else { 
-                System.out.println("ℹ️  No active session found.");
+                System.out.println("✅ Session data loaded successfully");
+
+            } else {
                 hasActiveSession = false;
-                currentSessionId = null;
+                cachedSessionJson = null;
+                System.out.println("ℹ️ No existing session found");
             }
-            
+
             rs.close();
             stmt.close();
-            
+            conn.close();
+
         } catch (Exception e) {
             System.err.println("❌ Error checking session!");
             e.printStackTrace();
             hasActiveSession = false;
+            cachedSessionJson = null;
         }
     }
-    
+
+    private NewCookie createSessionCookie() {
+        if (cachedSessionJson == null) {
+            return null;
+        }
+
+        return new NewCookie.Builder("sessionData")
+                .value(cachedSessionJson)
+                .maxAge(24 * 60 * 60)
+                .path("/")
+                .httpOnly(true)
+                .secure(false)
+                .build();
+    }
 
     private boolean isRateLimited(String ip) {
         String key = ip;
@@ -127,72 +155,48 @@ public class MainSources {
         data.setLastRequest(now);
         return false;
     }
-    
 
+    // Root endpoint - handles HTML requests
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response getRoot(@Context HttpHeaders headers) {
+        String clientIp = dedicatedIP.getClientIp(headers);
+        System.out.println("📡 Client IP: " + clientIp);
 
-  @GET
-  @Produces(MediaType.TEXT_HTML)
-  public Response getRoot(@Context HttpHeaders headers) { 
-    String clientIp = dedicatedIP.getClientIp(headers);
-    System.out.println("📡 Client IP: " + clientIp); 
-    if (dedicatedIP.isBlocked(clientIp)) {
-      return Response.status(403)
-        .entity("<h1>⛔ Access Denied - Your IP is Blocked</h1>")
-        .build();
-    }
+        if (dedicatedIP.isBlocked(clientIp)) {
+            return Response.status(403)
+                    .entity("<h1>⛔ Access Denied - Your IP is Blocked</h1>")
+                    .build();
+        }
+
         if (isRateLimited(clientIp)) {
             return Response.status(429)
                     .entity("<h1>⏳ Too Many Requests - Please wait 60 seconds</h1>")
                     .header("Retry-After", "60")
                     .build();
         }
-        if (!hasActiveSession) { 
+
+        if (!hasActiveSession) {
             return Response.seeOther(URI.create("/login"))
                     .cookie(
-                        new NewCookie("redirect_reason", "session_expired", "/", null, null, 60, false)
-                    )
+                            new NewCookie("redirect_reason", "session_expired", "/", null, null, 60, false))
                     .build();
-        }else{
-            return Response.seeOther(URI.create("/dashboard"))
+        } else {
+            Response.ResponseBuilder responseBuilder = Response.seeOther(URI.create("/dashboard"))
                     .cookie(
-                            new NewCookie("redirect_reason", "session_expired", "/", null, null, 60, true))
-                    .build();
+                            new NewCookie("redirect_reason", "session_active", "/", null, null, 60, true));
+
+            NewCookie sessionCookie = createSessionCookie();
+            if (sessionCookie != null) {
+                responseBuilder.cookie(sessionCookie);
+                System.out.println("🍪 Session cookie added to response");
+            }
+
+            return responseBuilder.build();
         }
-        // String sessionId = UUID.randomUUID().toString().replace("-", ""); 
-        // String jwtToken = jwtService.generateToken(sessionId, "user", clientIp);
-        // String csrfToken = jwtService.generateCsrfToken();
-        // String antiScrapeToken = jwtService.generateScrapeToken(clientIp);
+    }
 
-        // String html = htmlReaderService.readHtml();
-        // validCSRFTokens.put(sessionId, csrfToken);
-        
-        // String secureHtml = html
-        //             .replace("<!-- SESSION_ID -->", sessionId)
-        //             .replace("<!-- JWT_TOKEN -->", jwtToken)
-        //             .replace("<!-- CSRF_TOKEN -->", csrfToken)
-        //             .replace("<!-- ANTI_SCRAPE_TOKEN -->", antiScrapeToken)
-        //             .replace("<!-- CLIENT_IP -->", clientIp)
-        //             .replace("<!-- TIMESTAMP -->", String.valueOf(Instant.now().getEpochSecond()));  return Response.ok(secureHtml)
-        //         .cookie(new NewCookie("jwt_token", jwtToken, "/", null, null, 3600, true))
-        //         .cookie(new NewCookie("session_id", sessionId, "/", null, null, 3600, true))
-        //         .cookie(new NewCookie("csrf_token", csrfToken, "/", null, null, 3600, true))
-        //         .header("X-Content-Type-Options", "nosniff")
-        //         .header("X-Frame-Options", "DENY")
-        //         .header("X-XSS-Protection", "1; mode=block")
-        //         .header("Referrer-Policy", "no-referrer")
-        //         .header("Content-Security-Policy",
-        //                 "default-src 'self'; " +
-        //                 "script-src 'self' 'unsafe-inline' https:; " +
-        //                 "style-src 'self' 'unsafe-inline'; " +
-        //                 "img-src 'self' data:; " +
-        //                 "font-src 'self'; " +
-        //                 "connect-src 'self'")
-        //         .header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
-        //         .header("Cache-Control", "no-cache, no-store, must-revalidate")
-        //         .header("Pragma", "no-cache")
-        //         .build();
-    } 
-
+    // Health endpoint - always returns JSON
     @GET
     @Path("/health")
     @Produces(MediaType.APPLICATION_JSON)
@@ -200,10 +204,18 @@ public class MainSources {
         Map<String, Object> health = new HashMap<>();
         health.put("status", "UP");
         health.put("service", "Attendance System");
-        health.put("timestamp", java.time.LocalDateTime.now().toString()); 
-        return Response.ok(ResultResponse.success(health)).build();
+        health.put("timestamp", java.time.LocalDateTime.now().toString());
+        health.put("hasActiveSession", hasActiveSession);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("data", health);
+        response.put("message", null);
+
+        return Response.ok(response).build();
     }
 
+    // API info endpoint - always returns JSON
     @GET
     @Path("/api")
     @Produces(MediaType.APPLICATION_JSON)
@@ -211,8 +223,24 @@ public class MainSources {
         Map<String, Object> apiInfo = new HashMap<>();
         apiInfo.put("name", "Attendance System API");
         apiInfo.put("version", "1.0.0");
-        apiInfo.put("endpoints", getEndpoints()); 
-        return Response.ok(ResultResponse.success(apiInfo)).build();
+        apiInfo.put("endpoints", getEndpoints());
+        apiInfo.put("hasActiveSession", hasActiveSession);
+        apiInfo.put("timestamp", java.time.LocalDateTime.now().toString());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("data", apiInfo);
+        response.put("message", null);
+
+        return Response.ok(response).build();
+    }
+
+    // Debug endpoint
+    @GET
+    @Path("/ping")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String ping() {
+        return "pong";
     }
 
     private Map<String, String> getEndpoints() {
