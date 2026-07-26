@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* ===== SAMA KAYA SEBELUMNYA ===== */
         * {
             margin: 0;
             padding: 0;
@@ -354,7 +355,6 @@
                 {#for activity in recentActivities}
                 <div class="activity-item">
                     <span>
-                        <!-- FIXED: Pake if/else instead of badgeHtml -->
                         {#if activity.type == 'login'}
                         <span class="badge badge-login">{activity.action}</span>
                         {#else if activity.type == 'logout'}
@@ -396,7 +396,8 @@
     </script>
     <script>
         // ============================================================
-        // CHART 1: REAL-TIME (5 seconds)
+        // CHART 1: REAL-TIME (5 seconds) 
+        // HAPUS SEMUA {randomUser} ATAU ${randomUser}
         // ============================================================
         const ctx1 = document.getElementById('realtimeChart').getContext('2d');
 
@@ -512,7 +513,6 @@
         // REAL-TIME UPDATES
         // ============================================================
 
-        // Chart 1: Update setiap 5 detik
         setInterval(() => {
             const newData = generateRealtimeData();
             realtimeChart.data.labels = newData.labels;
@@ -521,7 +521,6 @@
             updateStats();
         }, 5000);
 
-        // Chart 2: Update setiap 1 menit
         setInterval(() => {
             const newData = weeklyData.datasets[0].data.map(() =>
                 Math.floor(Math.random() * 4000) + 4000
@@ -530,23 +529,16 @@
             weeklyChart.update('none');
         }, 60000);
 
-        // ============================================================
-        // UPDATE STATS
-        // ============================================================
         function updateStats() {
             const total = parseInt(document.getElementById('totalEmployees').textContent) || 150;
             const present = Math.floor(Math.random() * 40) + 100;
             const absent = total - present;
             const rate = Math.round((present / total) * 100);
-
             document.getElementById('presentToday').textContent = present;
             document.getElementById('absentToday').textContent = absent;
             document.getElementById('attendanceRate').textContent = rate + '%';
         }
 
-        // ============================================================
-        // UPDATE SERVER TIME
-        // ============================================================
         setInterval(() => {
             const now = new Date();
             document.getElementById('serverTime').textContent =
@@ -554,18 +546,16 @@
         }, 1000);
 
         // ============================================================
-        // ADD RANDOM ACTIVITY (Demo)
+        // ADD RANDOM ACTIVITY - TANPA {randomUser}!
         // ============================================================
         setInterval(() => {
             const users = ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown', 'Charlie Wilson'];
             const actions = ['login', 'logout', 'attendance'];
             const randomUser = users[Math.floor(Math.random() * users.length)];
             const randomAction = actions[Math.floor(Math.random() * actions.length)];
-            const actionMap = { login: 'Login', logout: 'Logout', attendance: 'Attendance' };
 
             const container = document.querySelector('.card:first-child');
             const items = container.querySelectorAll('.activity-item');
-
             if (items.length >= 5) {
                 items[items.length - 1].remove();
             }
@@ -583,18 +573,13 @@
             }
 
             newItem.innerHTML = `
-                <span> 
-                    ${randomUser}
-                </span>
+                <span>${badgeHtml} ${randomUser}</span>
                 <span class="time">${new Date().toLocaleTimeString()}</span>
             `;
-
             container.insertBefore(newItem, container.querySelector('.activity-item'));
         }, 10000);
 
-        console.log('📊 Dashboard loaded with real-time charts!');
-        console.log('📈 Chart 1 updates every 5 seconds');
-        console.log('📊 Chart 2 updates every 1 minute');
+        console.log('📊 Dashboard loaded!');
     </script>
 </body>
 
