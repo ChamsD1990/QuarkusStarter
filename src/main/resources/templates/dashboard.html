@@ -21,9 +21,8 @@
             padding: 20px;
         }
 
-        /* max-width: 1200px; */
         .container {
-            width: 100vh;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -216,15 +215,41 @@
             color: white;
             font-size: 12px;
             opacity: 0.8;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Chart container specific styles */
+        .chart-container {
+            margin-bottom: 25px;
+            position: relative;
+            height: 60vh;
+        }
+
+        .chart-container canvas {
+            width: 100% !important;
+            height: 90% !important;
         }
 
         @media (max-width: 768px) {
             .content-grid {
                 grid-template-columns: 1fr;
             }
+
+            .chart-container {
+                height: 300px;
+            }
         }
     </style>
-    
+    <!-- Use correct Font Awesome version -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/cdbootstrap/js/cdb.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cdbootstrap/js/bootstrap.min.js"></script>
+    <!-- Load Chart.js first -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
@@ -236,18 +261,100 @@
                 Welcome back, <strong>{username}</strong>! Last login: {lastLogin}
             </div>
         </div>
- 
 
-        <!-- Footer -->
+        <!-- Chart -->
+        <div class="card chart-container">
+            <h3>📊 Weekly Attendance Overview</h3>
+            <canvas id="attendanceChart"></canvas>
+        </div>
+  
         <div class="footer">
             © {currentYear} Attendance System v{version} | Server Time: {serverTime}
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/cdbootstrap/js/cdb.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cdbootstrap/js/bootstrap.min.js"></script>
-    <script src="https://kit.fontawesome.com/9d1d9a82d2.js" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+
+    <script>
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+            // Fixed Chart.js 4.x syntax
+            const myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                    datasets: [{
+                        label: 'Attendance',
+                        data: [3000, 4000, 2000, 5000, 8000, 9000, 2000],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            cornerRadius: 8,
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1000,
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+
+            // Make chart responsive on window resize
+            window.addEventListener('resize', function () {
+                myChart.resize();
+            });
+        });
+    </script>
 </body>
 
 </html>
