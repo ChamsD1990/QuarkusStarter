@@ -101,30 +101,40 @@ public class ApiSource {
     @POST
     @Path("/register")
     public Response register(RegistrationRequest request) {
-        // Validate input
-        if (request.username == null || request.username.trim().isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(ResultResponse.error("Username cannot be empty"))
-                    .build();
-        }
+        try {
+            // Validate input
+            if (request.username == null || request.username.trim().isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(ResultResponse.error("Username cannot be empty"))
+                        .build();
+            }
 
-        if (request.password == null || request.password.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(ResultResponse.error("Password cannot be empty"))
-                    .build();
-        }
+            if (request.password == null || request.password.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(ResultResponse.error("Password cannot be empty"))
+                        .build();
+            }
 
-        boolean registered = authService.registerUser(request.username, request.password);
+            // Panggil service yang return Response
+            Response authResponse = authService.registerUser(request.username, request.password);
 
-        if (registered) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("username", request.username);
-            data.put("registeredAt", Instant.now().toString());
-            return Response.ok(ResultResponse.success("User registered successfully")).build();
-        } else {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(ResultResponse
-                            .error("Registration failed. Username may already exist or password is too weak"))
+            // Kalo berhasil (201), tambahin data
+            if (authResponse.getStatus() == 201) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("username", request.username);
+                data.put("registeredAt", Instant.now().toString());
+
+                return Response.status(Response.Status.CREATED)
+                        .entity(ResultResponse.success("User registered successfully"))
+                        .build();
+            }
+
+            // Kalo gagal, return response dari authService
+            return authResponse;
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(ResultResponse.error("Registration failed: " + e.getMessage()))
                     .build();
         }
     }
@@ -132,33 +142,39 @@ public class ApiSource {
     @POST
     @Path("/login")
     public Response login(LoginRequest request) {
-        if (request.username == null || request.username.trim().isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(ResultResponse.error("Username cannot be empty"))
-                    .build();
-        }
+        try {
+            // Validasi input
+            if (request.username == null || request.username.trim().isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(ResultResponse.error("Username cannot be empty"))
+                        .build();
+            }
 
-        if (request.password == null || request.password.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(ResultResponse.error("Password cannot be empty"))
-                    .build();
-        }
+            if (request.password == null || request.password.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(ResultResponse.error("Password cannot be empty"))
+                        .build();
+            }
 
-        boolean authenticated = authService.authenticateUser(request.username, request.password);
+            // Panggil authService yang return Response
+            Response authResponse = authService.authenticateUser(request.username, request.password);
 
-        if (authenticated) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("username", request.username);
-            data.put("loginTime", Instant.now().toString());
+            // Kalo auth berhasil (200), tambahin data tambahan
+            if (authResponse.getStatus() == 200) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("username", request.username);
+                data.put("loginTime", Instant.now().toString());
+                data.put("token", jwtService.generateToken(request.username)); // Kalo pake JWT
 
-            // String token = jwtService.generateToken(request.username);
-            // data.put("token", token);
+                return Response.ok(ResultResponse.success("Login successful")).build();
+            }
 
-            return Response.ok(ResultResponse.success("Login successful")).build();
-        } else {
-            // Don't reveal if user exists or password is wrong (security best practice)
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity(ResultResponse.error("Invalid credentials or account locked"))
+            // Kalo auth gagal, return response dari authService
+            return authResponse;
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(ResultResponse.error("Login failed: " + e.getMessage()))
                     .build();
         }
     }
@@ -175,39 +191,46 @@ public class ApiSource {
     @PUT
     @Path("/change-password")
     public Response changePassword(ChangePasswordRequest request) {
-        // Validate input
-        if (request.username == null || request.username.trim().isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(ResultResponse.error("Username cannot be empty"))
-                    .build();
-        }
+        try {
+            // Validate input
+            if (request.username == null || request.username.trim().isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(ResultResponse.error("Username cannot be empty"))
+                        .build();
+            }
 
-        if (request.oldPassword == null || request.oldPassword.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(ResultResponse.error("Old password cannot be empty"))
-                    .build();
-        }
+            if (request.oldPassword == null || request.oldPassword.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(ResultResponse.error("Old password cannot be empty"))
+                        .build();
+            }
 
-        if (request.newPassword == null || request.newPassword.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(ResultResponse.error("New password cannot be empty"))
-                    .build();
-        }
+            if (request.newPassword == null || request.newPassword.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(ResultResponse.error("New password cannot be empty"))
+                        .build();
+            }
 
-        boolean changed = authService.changePassword(
-                request.username,
-                request.oldPassword,
-                request.newPassword);
+            // Panggil service
+            Response authResponse = authService.changePassword(
+                    request.username,
+                    request.oldPassword,
+                    request.newPassword);
 
-        if (changed) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("username", request.username);
-            data.put("changedAt", Instant.now().toString());
-            return Response.ok(ResultResponse.success("Password changed successfully")).build();
-        } else {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(ResultResponse
-                            .error("Password change failed. Check your old password or try a stronger new password"))
+            // Kalo berhasil (200), tambahin data
+            if (authResponse.getStatus() == 200) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("username", request.username);
+                data.put("changedAt", Instant.now().toString());
+
+                return Response.ok(ResultResponse.success("Password changed successfully")).build();
+            }
+
+            return authResponse;
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(ResultResponse.error("Password change failed: " + e.getMessage()))
                     .build();
         }
     }
@@ -228,59 +251,59 @@ public class ApiSource {
         }
 
         Map<String, Object> data = new HashMap<>();
-        data.put("username", username);
-        data.put("createdAt", authService.getUserCreatedAt(username));
-        data.put("exists", true);
+        // data.put("username", username);
+        // data.put("createdAt", authService.getUserCreatedAt(username));
+        // data.put("exists", true);
 
         return Response.ok(ResultResponse.success("User found")).build();
     }
 
     // Admin endpoints
-    @POST
-    @Path("/admin/unlock/{username}")
-    public Response unlockAccount(@PathParam("username") String username) {
-        // In production, add role-based access control here
-        boolean unlocked = authService.unlockAccount(username);
+    // @POST
+    // @Path("/admin/unlock/{username}")
+    // public Response unlockAccount(@PathParam("username") String username) {
+    //     // In production, add role-based access control here
+    //     boolean unlocked = authService.unlockAccount(username);
 
-        if (unlocked) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("username", username);
-            data.put("unlockedAt", Instant.now().toString());
-            return Response.ok(ResultResponse.success("Account unlocked successfully")).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(ResultResponse.error("User not found or account not locked"))
-                    .build();
-        }
-    }
+    //     if (unlocked) {
+    //         Map<String, Object> data = new HashMap<>();
+    //         data.put("username", username);
+    //         data.put("unlockedAt", Instant.now().toString());
+    //         return Response.ok(ResultResponse.success("Account unlocked successfully")).build();
+    //     } else {
+    //         return Response.status(Response.Status.NOT_FOUND)
+    //                 .entity(ResultResponse.error("User not found or account not locked"))
+    //                 .build();
+    //     }
+    // }
 
-    @DELETE
-    @Path("/admin/user/{username}")
-    public Response deleteUser(@PathParam("username") String username) {
-        // In production, add role-based access control here
-        boolean deleted = authService.deleteUser(username);
+    // @DELETE
+    // @Path("/admin/user/{username}")
+    // public Response deleteUser(@PathParam("username") String username) {
+    //     // In production, add role-based access control here
+    //     boolean deleted = authService.deleteUser(username);
 
-        if (deleted) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("username", username);
-            data.put("deletedAt", Instant.now().toString());
-            return Response.ok(ResultResponse.success("data success")).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(ResultResponse.error("User not found"))
-                    .build();
-        }
-    }
+    //     if (deleted) {
+    //         Map<String, Object> data = new HashMap<>();
+    //         data.put("username", username);
+    //         data.put("deletedAt", Instant.now().toString());
+    //         return Response.ok(ResultResponse.success("data success")).build();
+    //     } else {
+    //         return Response.status(Response.Status.NOT_FOUND)
+    //                 .entity(ResultResponse.error("User not found"))
+    //                 .build();
+    //     }
+    // }
 
-    @GET
-    @Path("/admin/users/count")
-    public Response getUserCount() {
-        int count = authService.getUserCount();
-        Map<String, Object> data = new HashMap<>();
-        data.put("totalUsers", count);
-        data.put("timestamp", Instant.now().toString());
-        return Response.ok(ResultResponse.success(data)).build();
-    }
+    // @GET
+    // @Path("/admin/users/count")
+    // public Response getUserCount() {
+    //     int count = authService.getUserCount();
+    //     Map<String, Object> data = new HashMap<>();
+    //     data.put("totalUsers", count);
+    //     data.put("timestamp", Instant.now().toString());
+    //     return Response.ok(ResultResponse.success(data)).build();
+    // }
 
     @POST
     @Path("/admin/clear")

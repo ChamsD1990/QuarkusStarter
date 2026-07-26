@@ -54,7 +54,7 @@ public class MainSources {
     void onStart(@Observes StartupEvent event) {
         this.serverIP = dedicatedIP.getPublicIPv4();
         printBanner();
-        SQLiteHelper.main(null);
+        // SQLiteHelper.main(null);
         checkExistingSession();
     }
 
