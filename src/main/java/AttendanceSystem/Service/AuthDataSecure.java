@@ -126,9 +126,7 @@ public class AuthDataSecure {
             json.put("createdAt", user.getCreatedAt());
             json.put("isLocked", user.isLocked());
             json.put("salt", user.getSalt());
-            System.out.println("🔍 User data from SQLite: " + json.toString(2));
-
-            // Cek lock
+            System.out.println("🔍 User data from SQLite: " + json.toString(2)); 
             if (user.isLocked()) {
                 if (user.getLockedUntil() != null && Instant.now().isBefore(user.getLockedUntil())) {
                     LOG.warnf("🔒 Account locked for user: %s until %s", username, user.getLockedUntil());
@@ -183,8 +181,7 @@ public class AuthDataSecure {
                     .build();
         }
     }
-
-    // ==================== CHECK PASSWORD (RETURN BOOLEAN) ====================
+ 
     private boolean checkPassword(String username, String password) {
         if (username == null || password == null) {
             return false;
@@ -213,8 +210,7 @@ public class AuthDataSecure {
             return false;
         }
     }
-
-    // ==================== GET USER FROM SQLITE ====================
+ 
     private UserCredential getUserFromDatabase(String username) throws SQLException {
         String sql = "SELECT * FROM users WHERE username = ?";
 
@@ -235,8 +231,7 @@ public class AuthDataSecure {
         }
         return null;
     }
-
-    // ==================== REGISTER USER ====================
+ 
     public Response registerUser(String username, String password) {
         if (username == null || username.trim().isEmpty()) {
             LOG.warn("❌ Registration attempt with empty username");
@@ -331,16 +326,14 @@ public class AuthDataSecure {
                     .entity("{\"status\":\"error\",\"code\":400,\"message\":\"New password cannot be empty\"}")
                     .build();
         }
-
-        // Cek old password - PAKE checkPassword (return boolean)
+ 
         if (!checkPassword(username, oldPassword)) {
             LOG.warnf("❌ Password change failed - invalid old password for user: %s", username);
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("{\"status\":\"error\",\"code\":401,\"message\":\"Invalid old password\"}")
                     .build();
         }
-
-        // Cek strength new password
+ 
         if (!isPasswordStrong(newPassword)) {
             LOG.warnf("❌ Password change failed - weak new password for user: %s", username);
             return Response.status(Response.Status.BAD_REQUEST)
