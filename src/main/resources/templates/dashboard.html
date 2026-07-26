@@ -5,11 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* ===== SAMA KAYA SEBELUMNYA ===== */
         * {
             margin: 0;
             padding: 0;
@@ -18,13 +14,13 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -33,7 +29,7 @@
             padding: 25px 30px;
             border-radius: 12px;
             margin-bottom: 25px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .header h1 {
@@ -62,9 +58,9 @@
             background: white;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, box-shadow 0.2s;
+            text-align: center;
         }
 
         .stat-card:hover {
@@ -96,41 +92,16 @@
             color: #388e3c;
         }
 
+        .stat-card.warning .number {
+            color: #f57c00;
+        }
+
         .stat-card.danger .number {
             color: #d32f2f;
         }
 
         .stat-card.info .number {
             color: #0097a7;
-        }
-
-        .stat-card.warning .number {
-            color: #f57c00;
-        }
-
-        .chart-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .chart-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .chart-card h4 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-
-        .chart-card .chart-container {
-            position: relative;
-            height: 250px;
         }
 
         .content-grid {
@@ -143,7 +114,7 @@
             background: white;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .card h3 {
@@ -195,11 +166,6 @@
             color: #0097a7;
         }
 
-        .badge-secondary {
-            background: #e0e0e0;
-            color: #616161;
-        }
-
         .quick-actions {
             display: flex;
             flex-direction: column;
@@ -213,7 +179,6 @@
             border-radius: 8px;
             text-align: center;
             font-weight: 600;
-            color: white;
             transition: transform 0.2s;
         }
 
@@ -223,59 +188,31 @@
 
         .btn-primary {
             background: #1976d2;
+            color: white;
         }
 
         .btn-success {
             background: #388e3c;
+            color: white;
         }
 
         .btn-warning {
             background: #f57c00;
+            color: white;
         }
 
         .btn-info {
             background: #0097a7;
+            color: white;
         }
 
         .footer {
             text-align: center;
             margin-top: 30px;
             padding: 20px;
-            color: #999;
+            color: white;
             font-size: 12px;
-        }
-
-        .live-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background: #28a745;
-            border-radius: 50%;
-            margin-left: 8px;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 0.5;
-                transform: scale(0.8);
-            }
-
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        @media (max-width: 992px) {
-            .chart-grid {
-                grid-template-columns: 1fr;
-            }
+            opacity: 0.8;
         }
 
         @media (max-width: 768px) {
@@ -293,8 +230,6 @@
             <h1>📊 {title}</h1>
             <div class="subtitle">
                 Welcome back, <strong>{username}</strong>! Last login: {lastLogin}
-                <span class="live-indicator"></span>
-                <small class="text-muted ms-1">Live</small>
             </div>
         </div>
 
@@ -302,47 +237,23 @@
         <div class="stats-grid">
             <div class="stat-card primary">
                 <div class="icon">👥</div>
-                <div class="number" id="totalEmployees">{totalEmployees}</div>
+                <div class="number">{totalEmployees}</div>
                 <div class="label">Total Employees</div>
             </div>
             <div class="stat-card success">
                 <div class="icon">✅</div>
-                <div class="number" id="presentToday">{presentToday}</div>
+                <div class="number">{presentToday}</div>
                 <div class="label">Present Today</div>
             </div>
             <div class="stat-card danger">
                 <div class="icon">❌</div>
-                <div class="number" id="absentToday">{absentToday}</div>
+                <div class="number">{absentToday}</div>
                 <div class="label">Absent Today</div>
             </div>
-            <div class="stat-card warning">
+            <div class="stat-card info">
                 <div class="icon">📈</div>
-                <div class="number" id="attendanceRate">{attendanceRate}%</div>
+                <div class="number">{attendanceRate}%</div>
                 <div class="label">Attendance Rate</div>
-            </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="chart-grid">
-            <div class="chart-card">
-                <h4>
-                    <i class="fas fa-chart-line text-primary me-2"></i>
-                    Real-time Attendance
-                    <small class="text-muted">(updates every 5s)</small>
-                </h4>
-                <div class="chart-container">
-                    <canvas id="realtimeChart"></canvas>
-                </div>
-            </div>
-            <div class="chart-card">
-                <h4>
-                    <i class="fas fa-chart-bar text-success me-2"></i>
-                    Weekly Attendance
-                    <small class="text-muted">(updates every 1m)</small>
-                </h4>
-                <div class="chart-container">
-                    <canvas id="weeklyChart"></canvas>
-                </div>
             </div>
         </div>
 
@@ -355,15 +266,7 @@
                 {#for activity in recentActivities}
                 <div class="activity-item">
                     <span>
-                        {#if activity.type == 'login'}
-                        <span class="badge badge-login">{activity.action}</span>
-                        {#else if activity.type == 'logout'}
-                        <span class="badge badge-logout">{activity.action}</span>
-                        {#else if activity.type == 'attendance'}
-                        <span class="badge badge-attendance">{activity.action}</span>
-                        {#else}
-                        <span class="badge badge-secondary">{activity.action}</span>
-                        {/if}
+                        <span class="badge badge-{activity.type}">{activity.action}</span>
                         {activity.user}
                     </span>
                     <span class="time">{activity.time}</span>
@@ -388,195 +291,9 @@
 
         <!-- Footer -->
         <div class="footer">
-            © {currentYear} Attendance System v{version} | Server Time: <span id="serverTime">{serverTime}</span>
+            © {currentYear} Attendance System v{version} | Server Time: {serverTime}
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
-    </script>
-    <script>
-        // ============================================================
-        // CHART 1: REAL-TIME (5 seconds) 
-        // ============================================================
-        const ctx1 = document.getElementById('realtimeChart').getContext('2d');
-
-        function generateRealtimeData() {
-            return {
-                labels: Array.from({ length: 20 }, (_, i) => {
-                    const d = new Date();
-                    d.setSeconds(d.getSeconds() - (19 - i) * 5);
-                    return d.toLocaleTimeString();
-                }),
-                data: Array.from({ length: 20 }, () => Math.floor(Math.random() * 100) + 50)
-            };
-        }
-
-        let realtimeData = generateRealtimeData();
-
-        const realtimeChart = new Chart(ctx1, {
-            type: 'line',
-            data: {
-                labels: realtimeData.labels,
-                datasets: [{
-                    label: 'Active Users',
-                    data: realtimeData.data,
-                    borderColor: '#1976d2',
-                    backgroundColor: 'rgba(25, 118, 210, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 3,
-                    pointBackgroundColor: '#1976d2'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: { font: { size: 11 } }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(0,0,0,0.05)' }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { font: { size: 9 }, maxTicksLimit: 10 }
-                    }
-                },
-                animation: { duration: 500 }
-            }
-        });
-
-        // ============================================================
-        // CHART 2: WEEKLY (1 minute)
-        // ============================================================
-        const ctx2 = document.getElementById('weeklyChart').getContext('2d');
-
-        const weeklyData = {
-            labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-            datasets: [{
-                label: 'Attendance',
-                data: [6500, 7200, 6800, 7900, 8500, 8200, 5800],
-                backgroundColor: [
-                    'rgba(25, 118, 210, 0.7)',
-                    'rgba(56, 142, 60, 0.7)',
-                    'rgba(245, 124, 0, 0.7)',
-                    'rgba(0, 151, 167, 0.7)',
-                    'rgba(211, 47, 47, 0.7)',
-                    'rgba(156, 39, 176, 0.7)',
-                    'rgba(96, 125, 139, 0.7)'
-                ],
-                borderColor: [
-                    '#1976d2', '#388e3c', '#f57c00', '#0097a7', '#d32f2f', '#9c27b0', '#607d8b'
-                ],
-                borderWidth: 2,
-                borderRadius: 4
-            }]
-        };
-
-        const weeklyChart = new Chart(ctx2, {
-            type: 'bar',
-            data: weeklyData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: { font: { size: 11 } }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(0,0,0,0.05)' },
-                        ticks: { font: { size: 10 } }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { font: { size: 10 } }
-                    }
-                },
-                animation: { duration: 800 }
-            }
-        });
-
-        // ============================================================
-        // REAL-TIME UPDATES
-        // ============================================================
-
-        setInterval(() => {
-            const newData = generateRealtimeData();
-            realtimeChart.data.labels = newData.labels;
-            realtimeChart.data.datasets[0].data = newData.data;
-            realtimeChart.update('none');
-            updateStats();
-        }, 5000);
-
-        setInterval(() => {
-            const newData = weeklyData.datasets[0].data.map(() =>
-                Math.floor(Math.random() * 4000) + 4000
-            );
-            weeklyChart.data.datasets[0].data = newData;
-            weeklyChart.update('none');
-        }, 60000);
-
-        function updateStats() {
-            const total = parseInt(document.getElementById('totalEmployees').textContent) || 150;
-            const present = Math.floor(Math.random() * 40) + 100;
-            const absent = total - present;
-            const rate = Math.round((present / total) * 100);
-            document.getElementById('presentToday').textContent = present;
-            document.getElementById('absentToday').textContent = absent;
-            document.getElementById('attendanceRate').textContent = rate + '%';
-        }
-
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('serverTime').textContent =
-                now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
-        }, 1000);
- 
-        setInterval(() => {
-            const users = ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown', 'Charlie Wilson'];
-            const actions = ['login', 'logout', 'attendance'];
-            const randomUser = users[Math.floor(Math.random() * users.length)];
-            const randomAction = actions[Math.floor(Math.random() * actions.length)];
-
-            const container = document.querySelector('.card:first-child');
-            const items = container.querySelectorAll('.activity-item');
-            if (items.length >= 5) {
-                items[items.length - 1].remove();
-            }
-
-            const newItem = document.createElement('div');
-            newItem.className = 'activity-item';
-
-            let badgeHtml = '';
-            if (randomAction === 'login') {
-                badgeHtml = '<span class="badge badge-login">Login</span>';
-            } else if (randomAction === 'logout') {
-                badgeHtml = '<span class="badge badge-logout">Logout</span>';
-            } else if (randomAction === 'attendance') {
-                badgeHtml = '<span class="badge badge-attendance">Attendance</span>';
-            }
-
-            newItem.innerHTML = `
-                <span>${{randomUser}}</span>
-                <span class="time">${new Date().toLocaleTimeString()}</span>
-            `;
-            container.insertBefore(newItem, container.querySelector('.activity-item'));
-        }, 10000);
-
-        console.log('📊 Dashboard loaded!');
-    </script>
 </body>
 
 </html>
