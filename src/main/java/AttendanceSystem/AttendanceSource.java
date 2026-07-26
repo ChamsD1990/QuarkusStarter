@@ -18,6 +18,7 @@ public class AttendanceSource {
     @Inject
     TransactionService transactionService;
 
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllTransactions() {
