@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* ===== STYLE SAMA KAYA SEBELUMNYA ===== */
         * {
             margin: 0;
             padding: 0;
@@ -171,7 +170,6 @@
             font-size: 12px;
         }
 
-        /* BADGE CLASSES - FIXED */
         .badge {
             display: inline-block;
             padding: 4px 12px;
@@ -356,7 +354,7 @@
                 {#for activity in recentActivities}
                 <div class="activity-item">
                     <span>
-                        <!-- FIXED: Pake if/else instead of dynamic class -->
+                        <!-- FIXED: Pake if/else instead of badgeHtml -->
                         {#if activity.type == 'login'}
                         <span class="badge badge-login">{activity.action}</span>
                         {#else if activity.type == 'logout'}
@@ -568,12 +566,10 @@
             const container = document.querySelector('.card:first-child');
             const items = container.querySelectorAll('.activity-item');
 
-            // Hapus item terakhir kalo udah 5
             if (items.length >= 5) {
                 items[items.length - 1].remove();
             }
 
-            // Buat item baru
             const newItem = document.createElement('div');
             newItem.className = 'activity-item';
 

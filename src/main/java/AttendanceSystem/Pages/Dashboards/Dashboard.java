@@ -20,12 +20,11 @@ import java.util.Map;
 public class Dashboard {
 
     @Inject
-    Template dashboard; // dashboard.html
+    Template dashboard;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response getDashboard() {
-        // Create data
         Map<String, Object> data = new HashMap<>();
         data.put("title", "Dashboard");
         data.put("username", "Admin User");
@@ -33,16 +32,14 @@ public class Dashboard {
         data.put("totalEmployees", 150);
         data.put("presentToday", 120);
         data.put("absentToday", 30);
-        data.put("attendanceRate", "80%");
+        data.put("attendanceRate", 80);
         data.put("recentActivities", getRecentActivities());
         data.put("currentYear", LocalDateTime.now().getYear());
         data.put("version", "1.0.0");
         data.put("serverTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
-        // Render template
         TemplateInstance template = dashboard.data(data);
         String html = template.render();
-
         return Response.ok(html).build();
     }
 
@@ -55,7 +52,6 @@ public class Dashboard {
                 new Activity("login", "Charlie Wilson", "07:50 AM"));
     }
 
-    // Inner class for activity
     public static class Activity {
         public String type;
         public String action;
