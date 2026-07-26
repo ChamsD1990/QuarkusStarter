@@ -109,6 +109,7 @@
             transform: translateY(0);
         }
 
+        /* FIX: Error Message Display */
         .error-message {
             color: #dc3545;
             background: #f8d7da;
@@ -116,20 +117,11 @@
             border-radius: 6px;
             margin-bottom: 20px;
             border-left: 4px solid #dc3545;
+            display: none;
+        }
 
-            display: {
-                #if error
-            }
-
-            block {
-                #else
-            }
-
-            none {
-                /if
-            }
-
-            ;
+        .error-message.show {
+            display: block;
         }
 
         .success-message {
@@ -139,20 +131,11 @@
             border-radius: 6px;
             margin-bottom: 20px;
             border-left: 4px solid #28a745;
+            display: none;
+        }
 
-            display: {
-                #if success
-            }
-
-            block {
-                #else
-            }
-
-            none {
-                /if
-            }
-
-            ;
+        .success-message.show {
+            display: block;
         }
 
         .register-link {
@@ -221,15 +204,22 @@
         <h2>🔐 {title}</h2>
         <p class="subtitle">{subtitle}</p>
 
-        <!-- Error Message -->
-        <div id="errorMessage" class="error-message {#if error}show{/if}">
+        <!-- Error Message - FIX: Pake if/else -->
+        {#if error}
+        <div id="errorMessage" class="error-message show">
             {error}
         </div>
-
-        <!-- Success Message -->
-        <div id="successMessage" class="success-message {#if success}show{/if}">
+        {#else}
+        <div id="errorMessage" class="error-message"></div>
+        {/if}
+ 
+        {#if success}
+        <div id="successMessage" class="success-message show">
             {success}
         </div>
+        {#else}
+        <div id="successMessage" class="success-message"></div>
+        {/if}
 
         <form id="loginForm" action="/api/login" method="POST">
             <div class="form-group">

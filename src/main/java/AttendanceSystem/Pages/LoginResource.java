@@ -16,34 +16,22 @@ import java.util.Map;
 public class LoginResource {
 
     @Inject
-    Template login; // Matches login.html in templates folder
+    Template login;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response showLogin() {
         Map<String, Object> data = new HashMap<>();
         data.put("title", "Login");
-        data.put("subtitle", "Enter your credentials to access the system");
+        data.put("subtitle", "Enter your credentials");
         data.put("version", "1.0.0");
         data.put("username", "");
         data.put("error", null);
         data.put("success", null);
-
+ 
         TemplateInstance template = login.data(data);
-        return Response.ok(template).build();
-    }
+        String html = template.render(); 
 
-    // Optional: Show login with error message
-    public Response showLoginWithError(String error) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("title", "Login");
-        data.put("subtitle", "Enter your credentials to access the system");
-        data.put("version", "1.0.0");
-        data.put("username", "");
-        data.put("error", error);
-        data.put("success", null);
-
-        TemplateInstance template = login.data(data);
-        return Response.ok(template).build();
+        return Response.ok(html).build();
     }
 }
