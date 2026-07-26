@@ -235,58 +235,7 @@
                 Welcome back, <strong>{username}</strong>! Last login: {lastLogin}
             </div>
         </div>
-
-        <!-- Statistics -->
-        <div class="stats-grid">
-            <div class="stat-card primary">
-                <div class="icon">👥</div>
-                <div class="number">{totalEmployees}</div>
-                <div class="label">Total Employees</div>
-            </div>
-            <div class="stat-card success">
-                <div class="icon">✅</div>
-                <div class="number">{presentToday}</div>
-                <div class="label">Present Today</div>
-            </div>
-            <div class="stat-card danger">
-                <div class="icon">❌</div>
-                <div class="number">{absentToday}</div>
-                <div class="label">Absent Today</div>
-            </div>
-            <div class="stat-card info">
-                <div class="icon">📈</div>
-                <div class="number">{attendanceRate}%</div>
-                <div class="label">Attendance Rate</div>
-            </div>
-        </div>
  
-        <div class="content-grid"> 
-            <div class="card">
-                <h3>📋 Recent Activities</h3>
-                {#if recentActivities}
-                {#for activity in recentActivities}
-                <div class="activity-item">
-                    <span>
-                        <span class="badge badge-{activity.type}">{activity.action}</span>
-                        {activity.user}
-                    </span>
-                    <span class="time">{activity.time}</span>
-                </div>
-                {/for}
-                {#else}
-                <p style="color: #999; text-align: center; padding: 20px;">No recent activities</p>
-                {/if}
-            </div> 
-            <div class="card">
-                <h3>⚡ Quick Actions</h3>
-                <div class="quick-actions">
-                    <a href="/attendance/mark" class="btn-primary">✅ Mark Attendance</a>
-                    <a href="/employees" class="btn-success">👥 View Employees</a>
-                    <a href="/reports" class="btn-warning">📊 Generate Report</a>
-                    <a href="/settings" class="btn-info">⚙️ Settings</a>
-                </div>
-            </div>
-        </div>
 
         <!-- Footer -->
         <div class="footer">
