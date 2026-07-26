@@ -7,9 +7,9 @@
     <title>{title}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* ===== STYLE SAMA KAYA SEBELUMNYA ===== */
         * {
             margin: 0;
             padding: 0;
@@ -171,6 +171,7 @@
             font-size: 12px;
         }
 
+        /* BADGE CLASSES - FIXED */
         .badge {
             display: inline-block;
             padding: 4px 12px;
@@ -193,6 +194,11 @@
         .badge-attendance {
             background: #e1f5fe;
             color: #0097a7;
+        }
+
+        .badge-secondary {
+            background: #e0e0e0;
+            color: #616161;
         }
 
         .quick-actions {
@@ -297,29 +303,28 @@
         <div class="stats-grid">
             <div class="stat-card primary">
                 <div class="icon">👥</div>
-                <div class="number" id="totalEmployees">150</div>
+                <div class="number" id="totalEmployees">{totalEmployees}</div>
                 <div class="label">Total Employees</div>
             </div>
             <div class="stat-card success">
                 <div class="icon">✅</div>
-                <div class="number" id="presentToday">120</div>
+                <div class="number" id="presentToday">{presentToday}</div>
                 <div class="label">Present Today</div>
             </div>
             <div class="stat-card danger">
                 <div class="icon">❌</div>
-                <div class="number" id="absentToday">30</div>
+                <div class="number" id="absentToday">{absentToday}</div>
                 <div class="label">Absent Today</div>
             </div>
             <div class="stat-card warning">
                 <div class="icon">📈</div>
-                <div class="number" id="attendanceRate">80%</div>
+                <div class="number" id="attendanceRate">{attendanceRate}%</div>
                 <div class="label">Attendance Rate</div>
             </div>
         </div>
 
         <!-- Charts -->
         <div class="chart-grid">
-            <!-- Chart 1: Real-time (5 seconds) -->
             <div class="chart-card">
                 <h4>
                     <i class="fas fa-chart-line text-primary me-2"></i>
@@ -330,8 +335,6 @@
                     <canvas id="realtimeChart"></canvas>
                 </div>
             </div>
-
-            <!-- Chart 2: Weekly (1 minute) -->
             <div class="chart-card">
                 <h4>
                     <i class="fas fa-chart-bar text-success me-2"></i>
@@ -353,7 +356,16 @@
                 {#for activity in recentActivities}
                 <div class="activity-item">
                     <span>
-                        <span class="badge badge-{activity.type}">{activity.action}</span>
+                        <!-- FIXED: Pake if/else instead of dynamic class -->
+                        {#if activity.type == 'login'}
+                        <span class="badge badge-login">{activity.action}</span>
+                        {#else if activity.type == 'logout'}
+                        <span class="badge badge-logout">{activity.action}</span>
+                        {#else if activity.type == 'attendance'}
+                        <span class="badge badge-attendance">{activity.action}</span>
+                        {#else}
+                        <span class="badge badge-secondary">{activity.action}</span>
+                        {/if}
                         {activity.user}
                     </span>
                     <span class="time">{activity.time}</span>
@@ -386,11 +398,10 @@
     </script>
     <script>
         // ============================================================
-        // CHART 1: REAL-TIME (Update every 5 seconds)
+        // CHART 1: REAL-TIME (5 seconds)
         // ============================================================
         const ctx1 = document.getElementById('realtimeChart').getContext('2d');
 
-        // Generate random data for real-time
         function generateRealtimeData() {
             return {
                 labels: Array.from({ length: 20 }, (_, i) => {
@@ -427,36 +438,25 @@
                     legend: {
                         display: true,
                         position: 'top',
-                        labels: {
-                            font: { size: 11 }
-                        }
+                        labels: { font: { size: 11 } }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0,0,0,0.05)'
-                        }
+                        grid: { color: 'rgba(0,0,0,0.05)' }
                     },
                     x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: { size: 9 },
-                            maxTicksLimit: 10
-                        }
+                        grid: { display: false },
+                        ticks: { font: { size: 9 }, maxTicksLimit: 10 }
                     }
                 },
-                animation: {
-                    duration: 500
-                }
+                animation: { duration: 500 }
             }
         });
 
         // ============================================================
-        // CHART 2: WEEKLY (Update every 1 minute)
+        // CHART 2: WEEKLY (1 minute)
         // ============================================================
         const ctx2 = document.getElementById('weeklyChart').getContext('2d');
 
@@ -492,33 +492,21 @@
                     legend: {
                         display: true,
                         position: 'top',
-                        labels: {
-                            font: { size: 11 }
-                        }
+                        labels: { font: { size: 11 } }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0,0,0,0.05)'
-                        },
-                        ticks: {
-                            font: { size: 10 }
-                        }
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        ticks: { font: { size: 10 } }
                     },
                     x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: { size: 10 }
-                        }
+                        grid: { display: false },
+                        ticks: { font: { size: 10 } }
                     }
                 },
-                animation: {
-                    duration: 800
-                }
+                animation: { duration: 800 }
             }
         });
 
@@ -526,25 +514,20 @@
         // REAL-TIME UPDATES
         // ============================================================
 
-        // Update Chart 1 every 5 seconds
+        // Chart 1: Update setiap 5 detik
         setInterval(() => {
             const newData = generateRealtimeData();
-
-            // Update chart data
             realtimeChart.data.labels = newData.labels;
             realtimeChart.data.datasets[0].data = newData.data;
             realtimeChart.update('none');
-
-            // Update stats randomly
             updateStats();
         }, 5000);
 
-        // Update Chart 2 every 1 minute
+        // Chart 2: Update setiap 1 menit
         setInterval(() => {
             const newData = weeklyData.datasets[0].data.map(() =>
                 Math.floor(Math.random() * 4000) + 4000
             );
-
             weeklyChart.data.datasets[0].data = newData;
             weeklyChart.update('none');
         }, 60000);
@@ -553,7 +536,7 @@
         // UPDATE STATS
         // ============================================================
         function updateStats() {
-            const total = 150;
+            const total = parseInt(document.getElementById('totalEmployees').textContent) || 150;
             const present = Math.floor(Math.random() * 40) + 100;
             const absent = total - present;
             const rate = Math.round((present / total) * 100);
@@ -581,27 +564,37 @@
             const randomUser = users[Math.floor(Math.random() * users.length)];
             const randomAction = actions[Math.floor(Math.random() * actions.length)];
             const actionMap = { login: 'Login', logout: 'Logout', attendance: 'Attendance' };
-            const badgeMap = { login: 'badge-login', logout: 'badge-logout', attendance: 'badge-attendance' };
 
-            const activityList = document.querySelector('.card:first-child .activity-item');
-            if (activityList) {
-                const newItem = document.createElement('div');
-                newItem.className = 'activity-item';
-                newItem.innerHTML = `
-                    <span>
-                        <span class="badge ${badgeMap[randomAction]}">${actionMap[randomAction]}</span>
-                        ${randomUser}
-                    </span>
-                    <span class="time">${new Date().toLocaleTimeString()}</span>
-                `;
+            const container = document.querySelector('.card:first-child');
+            const items = container.querySelectorAll('.activity-item');
 
-                const container = document.querySelector('.card:first-child');
-                const items = container.querySelectorAll('.activity-item');
-                if (items.length >= 5) {
-                    items[items.length - 1].remove();
-                }
-                container.insertBefore(newItem, container.querySelector('.activity-item'));
+            // Hapus item terakhir kalo udah 5
+            if (items.length >= 5) {
+                items[items.length - 1].remove();
             }
+
+            // Buat item baru
+            const newItem = document.createElement('div');
+            newItem.className = 'activity-item';
+
+            let badgeHtml = '';
+            if (randomAction === 'login') {
+                badgeHtml = '<span class="badge badge-login">Login</span>';
+            } else if (randomAction === 'logout') {
+                badgeHtml = '<span class="badge badge-logout">Logout</span>';
+            } else if (randomAction === 'attendance') {
+                badgeHtml = '<span class="badge badge-attendance">Attendance</span>';
+            }
+
+            newItem.innerHTML = `
+                <span>
+                    ${badgeHtml}
+                    ${randomUser}
+                </span>
+                <span class="time">${new Date().toLocaleTimeString()}</span>
+            `;
+
+            container.insertBefore(newItem, container.querySelector('.activity-item'));
         }, 10000);
 
         console.log('📊 Dashboard loaded with real-time charts!');
