@@ -1,4 +1,4 @@
-package AttendanceSystem.Pages;
+package AttendanceSystem.Pages.Auth;
 
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
@@ -12,26 +12,25 @@ import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
 
-@Path("/login")
-public class LoginResource {
+@Path("/register")
+public class RegisterResource {
 
     @Inject
-    Template login;
+    Template register; // register.html
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Response showLogin() {
+    public Response showRegister() {
         Map<String, Object> data = new HashMap<>();
-        data.put("title", "Login");
-        data.put("subtitle", "Enter your credentials");
+        data.put("title", "Register");
+        data.put("subtitle", "Create your account");
         data.put("version", "1.0.0");
         data.put("username", "");
+        data.put("email", "");
         data.put("error", null);
         data.put("success", null);
- 
-        TemplateInstance template = login.data(data);
-        String html = template.render(); 
 
+        String html = register.data(data).render();
         return Response.ok(html).build();
     }
 }
