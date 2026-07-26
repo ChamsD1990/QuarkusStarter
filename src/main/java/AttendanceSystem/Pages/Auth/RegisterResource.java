@@ -16,7 +16,7 @@ import java.util.Map;
 public class RegisterResource {
 
     @Inject
-    Template register; // register.html
+    Template register;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -29,6 +29,8 @@ public class RegisterResource {
         data.put("email", "");
         data.put("error", null);
         data.put("success", null);
+        data.put("message", null); 
+        data.put("type", null); 
 
         String html = register.data(data).render();
         return Response.ok(html).build();

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import AttendanceSystem.Service.helper.SQLiteHelper;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -595,10 +596,16 @@ public class AuthDataSecure {
     private String hashPassword(String password, String salt)
             throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        String saltedPassword = salt + password;
-        byte[] hashedBytes = md.digest(saltedPassword.getBytes());
+        
+        // PASTIKAN URUTANNYA SAMA!
+        String saltedPassword = salt + password; // SALT + PASSWORD
+        // ATAU
+        // String saltedPassword = password + salt; // PASSWORD + SALT
+        
+        byte[] hashedBytes = md.digest(saltedPassword.getBytes(StandardCharsets.UTF_8));
         return Base64.getEncoder().encodeToString(hashedBytes);
     }
+
 
     private void printUserData(String username) {
         try {

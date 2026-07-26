@@ -4,16 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title}</title>
+    <title>Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -28,7 +23,7 @@
             border-radius: 12px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 420px;
+            max-width: 450px;
             animation: fadeIn 0.5s ease;
         }
 
@@ -47,54 +42,76 @@
         .register-container h2 {
             text-align: center;
             color: #333;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .subtitle {
             text-align: center;
             color: #888;
             font-size: 14px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            color: #555;
             font-weight: 500;
             font-size: 14px;
+            color: #555;
         }
 
-        .form-group input {
-            width: 100%;
-            padding: 12px;
+        .form-group .form-control {
             border: 2px solid #e1e5e9;
             border-radius: 6px;
-            font-size: 16px;
-            transition: all 0.3s;
+            padding: 12px;
+            font-size: 15px;
         }
 
-        .form-group input:focus {
-            outline: none;
+        .form-group .form-control:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .form-group input.error {
-            border-color: #dc3545;
+        .input-group-text {
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-right: none;
+            color: #888;
         }
 
+        .input-group .form-control {
+            border-left: none;
+        }
+
+        /* Password Requirements - Hidden by default */
         .password-requirements {
             font-size: 12px;
             color: #888;
-            margin-top: 5px;
-            padding: 8px;
+            margin-top: 8px;
+            padding: 10px 12px;
             background: #f8f9fa;
-            border-radius: 4px;
+            border-radius: 6px;
+            display: none;
+            /* HIDDEN BY DEFAULT */
+            animation: slideDown 0.3s ease;
+        }
+
+        .password-requirements.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .password-requirements ul {
@@ -106,13 +123,23 @@
         .password-requirements li {
             padding: 2px 0;
             color: #888;
+            font-size: 12px;
+            transition: all 0.3s;
         }
 
         .password-requirements li.valid {
             color: #28a745;
         }
 
+        .password-requirements li.valid i {
+            color: #28a745;
+        }
+
         .password-requirements li.invalid {
+            color: #dc3545;
+        }
+
+        .password-requirements li.invalid i {
             color: #dc3545;
         }
 
@@ -137,35 +164,6 @@
         .register-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
-        }
-
-        .error-message {
-            color: #dc3545;
-            background: #f8d7da;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border-left: 4px solid #dc3545;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        .success-message {
-            color: #28a745;
-            background: #d4edda;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border-left: 4px solid #28a745;
-            display: none;
-        }
-
-        .success-message.show {
-            display: block;
         }
 
         .login-link {
@@ -195,44 +193,24 @@
             display: block;
         }
 
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
         .footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 25px;
             color: #ccc;
             font-size: 12px;
         }
 
-        .version {
-            color: #ddd;
-            font-size: 11px;
-        }
-
         .password-strength {
             height: 4px;
-            margin-top: 8px;
+            margin-top: 6px;
             border-radius: 2px;
             background: #e1e5e9;
             transition: all 0.3s;
+            display: none;
+        }
+
+        .password-strength.show {
+            display: block;
         }
 
         .password-strength.weak {
@@ -259,6 +237,11 @@
             font-size: 11px;
             margin-top: 4px;
             text-align: right;
+            display: none;
+        }
+
+        .strength-text.show {
+            display: block;
         }
 
         .strength-text.weak {
@@ -272,90 +255,142 @@
         .strength-text.strong {
             color: #28a745;
         }
+
+        .form-text {
+            font-size: 12px;
+            margin-top: 4px;
+        }
     </style>
 </head>
 
 <body>
     <div class="register-container">
-        <h2>📝 {title}</h2>
-        <p class="subtitle">{subtitle}</p>
+        <h2><i class="fas fa-user-plus text-primary me-2"></i>Register</h2>
+        <p class="subtitle">Create your account</p>
 
-        {#if error}
-        <div id="errorMessage" class="error-message show">
-            {error}
-        </div>
-        {#else}
-        <div id="errorMessage" class="error-message"></div>
-        {/if}
-
-        {#if success}
-        <div id="successMessage" class="success-message show">
-            {success}
-        </div>
-        {#else}
-        <div id="successMessage" class="success-message"></div>
-        {/if}
+        <div id="alertContainer"></div>
 
         <form id="registerForm">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Choose a username" value="{username}"
-                    required autofocus>
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" value="{email}" required>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Create a password" required>
-                <div class="password-strength" id="passwordStrength"></div>
-                <div class="strength-text" id="strengthText"></div>
-                <div class="password-requirements">
-                    <small>Password must have:</small>
-                    <ul>
-                        <li id="reqLength" class="invalid">✓ At least 8 characters</li>
-                        <li id="reqUpper" class="invalid">✓ At least one uppercase letter</li>
-                        <li id="reqLower" class="invalid">✓ At least one lowercase letter</li>
-                        <li id="reqDigit" class="invalid">✓ At least one number</li>
-                        <li id="reqSpecial" class="invalid">✓ At least one special character</li>
-                    </ul>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="username">Username</label>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" id="username" name="username" class="form-control"
+                            placeholder="Choose a username" required autofocus>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password"
-                    required>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="email">Email</label>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email"
+                            required>
+                    </div>
+                </div>
             </div>
 
-            <button type="submit" class="register-btn" id="registerBtn">Create Account</button>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="password">Password</label>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" id="password" name="password" class="form-control"
+                            placeholder="Create a password" required>
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <!-- Strength Bar - Hidden by default -->
+                    <div class="password-strength" id="passwordStrength"></div>
+                    <div class="strength-text" id="strengthText"></div>
+
+                    <!-- Password Requirements - Hidden by default -->
+                    <div class="password-requirements" id="passwordRequirements">
+                        <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Password must have:</small>
+                        <ul>
+                            <li id="reqLength" class="invalid">
+                                <i class="fas fa-circle me-1" style="font-size:6px;"></i>At least 8 characters
+                            </li>
+                            <li id="reqUpper" class="invalid">
+                                <i class="fas fa-circle me-1" style="font-size:6px;"></i>At least one uppercase letter
+                            </li>
+                            <li id="reqLower" class="invalid">
+                                <i class="fas fa-circle me-1" style="font-size:6px;"></i>At least one lowercase letter
+                            </li>
+                            <li id="reqDigit" class="invalid">
+                                <i class="fas fa-circle me-1" style="font-size:6px;"></i>At least one number
+                            </li>
+                            <li id="reqSpecial" class="invalid">
+                                <i class="fas fa-circle me-1" style="font-size:6px;"></i>At least one special character
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="confirmPassword">Re-Password</label>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-check"></i></span>
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control"
+                            placeholder="Confirm your password" required>
+                    </div>
+                    <div id="confirmMessage" class="form-text"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="register-btn" id="registerBtn">
+                <i class="fas fa-user-plus me-2"></i>Create Account
+            </button>
         </form>
 
         <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p style="margin-top: 10px; color: #888; font-size: 14px;">Creating account...</p>
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2" style="font-size:14px;">Creating account...</p>
         </div>
 
         <div class="login-link">
-            Already have an account? <a href="/login">Sign in</a>
+            Already have an account? <a href="/login"><i class="fas fa-sign-in-alt me-1"></i>Sign in</a>
         </div>
 
         <div class="footer">
-            <span class="version">v{version}</span>
+            <span class="version text-muted">v1.0.0</span>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        });
+
         // ============================================================
-        // PASSWORD STRENGTH CHECKER
+        // PASSWORD STRENGTH CHECKER WITH SHOW/HIDE
         // ============================================================
         const passwordInput = document.getElementById('password');
         const confirmInput = document.getElementById('confirmPassword');
         const strengthBar = document.getElementById('passwordStrength');
         const strengthText = document.getElementById('strengthText');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const requirementsDiv = document.getElementById('passwordRequirements');
 
         const reqLength = document.getElementById('reqLength');
         const reqUpper = document.getElementById('reqUpper');
@@ -363,10 +398,55 @@
         const reqDigit = document.getElementById('reqDigit');
         const reqSpecial = document.getElementById('reqSpecial');
 
+        let isRequirementsVisible = false;
+
+        passwordInput.addEventListener('focus', function () {
+            // Show requirements when password field gets focus
+            if (this.value.length === 0) {
+                requirementsDiv.classList.add('show');
+                isRequirementsVisible = true;
+            }
+        });
+
         passwordInput.addEventListener('input', function () {
             const password = this.value;
+
+            // Show requirements when user starts typing
+            if (password.length > 0 && !isRequirementsVisible) {
+                requirementsDiv.classList.add('show');
+                strengthBar.classList.add('show');
+                strengthText.classList.add('show');
+                isRequirementsVisible = true;
+            }
+
+            // Check strength
             checkPasswordStrength(password);
+            checkConfirmPassword();
+
+            // Hide requirements if password is empty
+            if (password.length === 0) {
+                requirementsDiv.classList.remove('show');
+                strengthBar.classList.remove('show');
+                strengthText.classList.remove('show');
+                isRequirementsVisible = false;
+
+                // Reset requirements
+                resetRequirements();
+            }
         });
+
+        function resetRequirements() {
+            const items = [reqLength, reqUpper, reqLower, reqDigit, reqSpecial];
+            items.forEach(item => {
+                item.className = 'invalid';
+                const icon = item.querySelector('i');
+                icon.className = 'fas fa-circle me-1';
+                icon.style.fontSize = '6px';
+            });
+            strengthBar.className = 'password-strength';
+            strengthText.textContent = '';
+            strengthText.className = 'strength-text';
+        }
 
         function checkPasswordStrength(password) {
             const checks = {
@@ -377,25 +457,30 @@
                 special: /[^A-Za-z0-9]/.test(password)
             };
 
-            // Update requirements
             updateRequirement(reqLength, checks.length);
             updateRequirement(reqUpper, checks.upper);
             updateRequirement(reqLower, checks.lower);
             updateRequirement(reqDigit, checks.digit);
             updateRequirement(reqSpecial, checks.special);
 
-            // Calculate strength
             const score = Object.values(checks).filter(Boolean).length;
             updateStrengthBar(score);
         }
 
         function updateRequirement(element, isValid) {
             element.className = isValid ? 'valid' : 'invalid';
-            element.textContent = (isValid ? '✅' : '○') + element.textContent.substring(1);
+            const icon = element.querySelector('i');
+            if (isValid) {
+                icon.className = 'fas fa-check-circle me-1';
+                icon.style.fontSize = '12px';
+            } else {
+                icon.className = 'fas fa-circle me-1';
+                icon.style.fontSize = '6px';
+            }
         }
 
         function updateStrengthBar(score) {
-            const strengthLevels = [
+            const levels = [
                 { score: 0, class: '', text: '' },
                 { score: 1, class: 'weak', text: 'Weak' },
                 { score: 2, class: 'weak', text: 'Weak' },
@@ -403,11 +488,36 @@
                 { score: 4, class: 'strong', text: 'Strong' },
                 { score: 5, class: 'very-strong', text: 'Very Strong' }
             ];
-
-            const level = strengthLevels[score] || strengthLevels[0];
-            strengthBar.className = 'password-strength ' + level.class;
+            const level = levels[score] || levels[0];
+            strengthBar.className = 'password-strength show ' + level.class;
             strengthText.textContent = level.text;
-            strengthText.className = 'strength-text ' + level.class;
+            strengthText.className = 'strength-text show ' + level.class;
+        }
+
+        // ============================================================
+        // CONFIRM PASSWORD CHECK
+        // ============================================================
+        confirmInput.addEventListener('input', function () {
+            checkConfirmPassword();
+        });
+
+        function checkConfirmPassword() {
+            const password = passwordInput.value;
+            const confirm = confirmInput.value;
+            if (confirm.length === 0) {
+                confirmMessage.textContent = '';
+                confirmInput.className = 'form-control';
+                return;
+            }
+            if (password === confirm) {
+                confirmMessage.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i>Passwords match!';
+                confirmMessage.className = 'form-text text-success';
+                confirmInput.className = 'form-control is-valid';
+            } else {
+                confirmMessage.innerHTML = '<i class="fas fa-exclamation-circle text-danger me-1"></i>Passwords do not match';
+                confirmMessage.className = 'form-text text-danger';
+                confirmInput.className = 'form-control is-invalid';
+            }
         }
 
         // ============================================================
@@ -421,40 +531,34 @@
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            // Validate
+            // Validations
             if (!username || username.length < 3) {
-                showError('Username must be at least 3 characters');
+                showAlert('Username must be at least 3 characters', 'danger');
                 return;
             }
-
             if (!email || !email.includes('@')) {
-                showError('Please enter a valid email address');
+                showAlert('Please enter a valid email address', 'danger');
                 return;
             }
-
             if (password.length < 8) {
-                showError('Password must be at least 8 characters');
+                showAlert('Password must be at least 8 characters', 'danger');
                 return;
             }
-
             if (password !== confirmPassword) {
-                showError('Passwords do not match');
+                showAlert('Passwords do not match', 'danger');
                 return;
             }
 
             // Show loading
             document.getElementById('loading').classList.add('show');
             document.getElementById('registerBtn').disabled = true;
-            document.getElementById('registerBtn').textContent = 'Creating...';
-
-            hideMessages();
+            document.getElementById('registerBtn').innerHTML =
+                '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
 
             try {
                 const response = await fetch('/api/register', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, email, password })
                 });
 
@@ -462,67 +566,42 @@
 
                 document.getElementById('loading').classList.remove('show');
                 document.getElementById('registerBtn').disabled = false;
-                document.getElementById('registerBtn').textContent = 'Create Account';
+                document.getElementById('registerBtn').innerHTML =
+                    '<i class="fas fa-user-plus me-2"></i>Create Account';
 
                 if (response.status === 201) {
-                    // Success
-                    const successDiv = document.getElementById('successMessage');
-                    successDiv.textContent = data.message || 'Account created successfully! Redirecting to login...';
-                    successDiv.classList.add('show');
-
-                    // Redirect to login after 2 seconds
+                    showAlert('Account created successfully! Redirecting to login...', 'success');
                     setTimeout(() => {
                         window.location.href = '/login';
                     }, 2000);
                 } else {
-                    // Error
-                    const errorDiv = document.getElementById('errorMessage');
-                    errorDiv.textContent = data.message || 'Registration failed. Please try again.';
-                    errorDiv.classList.add('show');
+                    showAlert(data.message || 'Registration failed. Please try again.', 'danger');
                 }
             } catch (error) {
                 console.error('Register error:', error);
                 document.getElementById('loading').classList.remove('show');
                 document.getElementById('registerBtn').disabled = false;
-                document.getElementById('registerBtn').textContent = 'Create Account';
-
-                const errorDiv = document.getElementById('errorMessage');
-                errorDiv.textContent = 'Network error. Please try again.';
-                errorDiv.classList.add('show');
+                document.getElementById('registerBtn').innerHTML =
+                    '<i class="fas fa-user-plus me-2"></i>Create Account';
+                showAlert('Network error. Please try again.', 'danger');
             }
         });
 
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.classList.add('show');
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.innerHTML = '';
+            container.appendChild(alert);
             setTimeout(() => {
-                errorDiv.classList.remove('show');
+                if (alert.parentNode) alert.remove();
             }, 5000);
         }
-
-        function hideMessages() {
-            document.getElementById('errorMessage').classList.remove('show');
-            document.getElementById('successMessage').classList.remove('show');
-        }
-
-        // ============================================================
-        // CONFIRM PASSWORD CHECK
-        // ============================================================
-        confirmInput.addEventListener('input', function () {
-            const password = passwordInput.value;
-            const confirm = this.value;
-
-            if (confirm.length > 0) {
-                if (password === confirm) {
-                    this.style.borderColor = '#28a745';
-                } else {
-                    this.style.borderColor = '#dc3545';
-                }
-            } else {
-                this.style.borderColor = '';
-            }
-        });
     </script>
 </body>
 
