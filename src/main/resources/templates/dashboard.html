@@ -543,10 +543,7 @@
             document.getElementById('serverTime').textContent =
                 now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
         }, 1000);
-
-        // ============================================================
-        // ADD RANDOM ACTIVITY - TANPA {randomUser}!
-        // ============================================================
+ 
         setInterval(() => {
             const users = ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown', 'Charlie Wilson'];
             const actions = ['login', 'logout', 'attendance'];
@@ -572,7 +569,7 @@
             }
 
             newItem.innerHTML = `
-                <span>${badgeHtml} ${randomUser}</span>
+                <span>${{randomUser}}</span>
                 <span class="time">${new Date().toLocaleTimeString()}</span>
             `;
             container.insertBefore(newItem, container.querySelector('.activity-item'));
