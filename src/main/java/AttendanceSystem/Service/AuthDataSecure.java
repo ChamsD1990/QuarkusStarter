@@ -13,11 +13,13 @@ import AttendanceSystem.Service.helper.SQLiteHelper;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.security.SecureRandom; 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Map;
@@ -101,7 +103,6 @@ public class AuthDataSecure {
         }
     }
 
-    // ==================== AUTHENTICATE USER (RETURN RESPONSE) ====================
     public Response authenticateUser(String username, String password) {
         if (username == null || password == null) {
             LOG.warn("❌ Username or password is null");
@@ -152,7 +153,23 @@ public class AuthDataSecure {
 
             if (authenticated) {
                 failedAttempts.remove(username);
-                LOG.infof("✅ User authenticated successfully: %s", username);
+                Timestamp session_created = Timestamp.from(Instant.now());
+                Timestamp session_max = Timestamp.from(Instant.now().plusSeconds(60)); 
+                String sql = """
+                        INSERT INTO sessionData (username, password, session_created, session_max, isAuthenticated)
+                        VALUES (?, ?, ?, ?, ?)
+                        """; 
+                try (Connection conn = SQLiteHelper.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) { 
+                    pstmt.setString(1, username);
+                    pstmt.setString(2, hashedInput);
+                    pstmt.setTimestamp(3, session_created);
+                    pstmt.setTimestamp(4, session_max);
+                    pstmt.setInt(5, authenticated ? 1 : 0); 
+                    int rows = pstmt.executeUpdate();
+                    LOG.infof("✅ Inserted %d row(s)", rows); 
+                } catch (SQLException e) {
+                    LOG.errorf("❌ Error: %s", e.getMessage());
+                } 
 
                 JSONObject successJson = new JSONObject();
                 successJson.put("status", "success");
@@ -567,8 +584,7 @@ public class AuthDataSecure {
                     .build();
         }
     }
-
-    // ==================== HELPER METHODS ====================
+ 
     private boolean isPasswordStrong(String password) {
         if (password == null || password.length() < 8) {
             return false;

@@ -45,9 +45,13 @@ public class Dashboard {
         return labels;
     }
 
+    
+
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response getDashboard() { 
+
         List<String> timings = generateTimeLabels("08", "00", 15, 15);
         Map<String, Object> data = new HashMap<>();
         try {

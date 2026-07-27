@@ -21,6 +21,9 @@ public class LoginResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response showLogin() {
+
+        //check login
+
         Map<String, Object> data = new HashMap<>();
         data.put("title", "Login");
         data.put("subtitle", "Enter your credentials");

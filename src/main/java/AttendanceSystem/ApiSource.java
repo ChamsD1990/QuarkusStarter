@@ -145,31 +145,23 @@ public class ApiSource {
         try {
             // Validasi input
             if (request.username == null || request.username.trim().isEmpty()) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(ResultResponse.error("Username cannot be empty"))
+                return Response.status(Response.Status.BAD_REQUEST).entity(ResultResponse.error("Username cannot be empty"))
                         .build();
-            }
-
+            } 
             if (request.password == null || request.password.isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity(ResultResponse.error("Password cannot be empty"))
                         .build();
-            }
-
-            // Panggil authService yang return Response
-            Response authResponse = authService.authenticateUser(request.username, request.password);
-
-            // Kalo auth berhasil (200), tambahin data tambahan
+            } 
+            Response authResponse = authService.authenticateUser(request.username, request.password); 
             if (authResponse.getStatus() == 200) {
                 Map<String, Object> data = new HashMap<>();
                 data.put("username", request.username);
                 data.put("loginTime", Instant.now().toString());
-                data.put("token", jwtService.generateToken(request.username)); // Kalo pake JWT
+                data.put("token", jwtService.generateToken(request.username)); 
 
                 return Response.ok(ResultResponse.success("Login successful")).build();
-            }
-
-            // Kalo auth gagal, return response dari authService
+            } 
             return authResponse;
 
         } catch (Exception e) {
@@ -178,7 +170,7 @@ public class ApiSource {
                     .build();
         }
     }
-
+ 
     @POST
     @Path("/logout")
     public Response logout() {
