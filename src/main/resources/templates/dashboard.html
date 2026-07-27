@@ -260,21 +260,22 @@
                 Welcome back, <strong>{username}</strong>! Last login: {lastLogin}
             </div>
         </div> 
-        <div class="card chart-container">
-            <h3>📊 Weekly Attendance Overview</h3>
-            <canvas id="attendanceChart"></canvas>
-        </div> 
+        <div class="row">
+            <div 
+            <div class="card chart-container">
+                <h3>📊 Weekly Attendance Overview</h3>
+                <canvas id="attendanceChart"></canvas>
+            </div> 
+        </div>
         <div class="footer">
             © {currentYear} Attendance System v{version} | Server Time: {serverTime}
         </div>
     </div>
 
-    <script>
-        // Wait for DOM to load
+    <script> 
         document.addEventListener('DOMContentLoaded', function () {
-            const ctx = document.getElementById('attendanceChart').getContext('2d');
-
-            // Fixed Chart.js 4.x syntax
+            const timeStart = "{serverTime}";
+            const ctx = document.getElementById('attendanceChart').getContext('2d'); 
             const myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
