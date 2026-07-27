@@ -3,6 +3,7 @@ package AttendanceSystem.Pages.Dashboards;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import jakarta.inject.Inject;
+import jakarta.json.JsonException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -11,25 +12,56 @@ import jakarta.ws.rs.core.Response;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializable;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Path("/dashboard")
 public class Dashboard {
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @Inject
     Template dashboard;
 
+    public static List<String> generateTimeLabels(String startHour, String startMinute, 
+                                                   int incrementMinutes, int count) {
+        List<String> labels = new ArrayList<>(); 
+        int hour = Integer.parseInt(startHour);
+        int minute = Integer.parseInt(startMinute);
+        LocalTime current = LocalTime.of(hour, minute);  
+        for (int i = 0; i < count; i++) {
+            labels.add(current.format(TIME_FORMATTER));
+            current = current.plusMinutes(incrementMinutes);
+        }
+        
+        return labels;
+    }
+
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Response getDashboard() {
-        String starthours = "08";
-        String startMinute = "00";
-
+    public Response getDashboard() { 
+        List<String> timings = generateTimeLabels("08", "00", 15, 15);
         Map<String, Object> data = new HashMap<>();
+         
+        try {
+            // String timingsJson = mapper.writeValueAsString(timings);
+            JSONArray arrJson = new JSONArray(timings);
+            data.put("timings", arrJson);
+        } catch (JsonException e) {
+            e.printStackTrace();
+            data.put("timings", "[]");
+        }
+
         data.put("title", "Dashboard");
         data.put("username", "Admin User");
         data.put("lastLogin", "Today at 08:30 AM");
@@ -39,11 +71,9 @@ public class Dashboard {
         data.put("attendanceRate", 80);
         data.put("recentActivities", getRecentActivities());
         data.put("currentYear", LocalDateTime.now().getYear());
-        data.put("version", "1.0.0");
-        data.put("startHours", starthours);
-        data.put("startMinute", startMinute);
+        data.put("version", "1.0.0"); 
         data.put("serverTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        
+
         TemplateInstance template = dashboard.data(data);
         String html = template.render();
         return Response.ok(html).build();

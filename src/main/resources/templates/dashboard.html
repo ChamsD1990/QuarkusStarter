@@ -261,11 +261,17 @@
             </div>
         </div> 
         <div class="row">
-            <div 
+          <div class="col-md-6">
             <div class="card chart-container">
-                <h3>📊 Weekly Attendance Overview</h3>
-                <canvas id="attendanceChart"></canvas>
+            <h3>📊 Weekly Attendance Overview</h3>
+            <canvas id="attendanceChart"></canvas>
             </div> 
+          </div>
+          <div class="col-md-6">
+            <div class="chart-container">
+              <canvas id="attendanceChart"></canvas>
+            </div>
+          </div>
         </div>
         <div class="footer">
             © {currentYear} Attendance System v{version} | Server Time: {serverTime}
@@ -274,7 +280,12 @@
 
     <script> 
         document.addEventListener('DOMContentLoaded', function () {
-            const timeStart = "{serverTime}";
+            const dataText = "{timings}"; 
+            const parser = new DOMParser();
+            const decoded = parser.parseFromString(dataText, 'text/html').body.textContent;
+            const timingsArray = JSON.parse(decoded);
+            console.log(timingsArray);
+            
             const ctx = document.getElementById('attendanceChart').getContext('2d'); 
             const myChart = new Chart(ctx, {
                 type: 'line',
@@ -345,10 +356,112 @@
                     }
                 }
             });
+ 
+            
+            const ctxLine = document.getElementById('attendanceChart').getContext('2d');
 
-            // Make chart responsive on window resize
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                    datasets: [{
+                        label: 'Attendance',
+                        data: [3000, 4000, 2000, 5000, 8000, 9000, 2000],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 9
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            cornerRadius: 8,
+                            padding: 12,
+                            callbacks: {
+                                label: function (context) {
+                                    return `Attendance: ${context.parsed.y.toLocaleString()} people`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10000,
+                            ticks: {
+                                stepSize: 1000,
+                                font: {
+                                    size: 12
+                                },
+                                callback: function (value) {
+                                    return value.toLocaleString();
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.08)'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Number of People',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 13
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Day of Week',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+
             window.addEventListener('resize', function () {
                 myChart.resize();
+                ctxLine.resize();
             });
         });
     </script>
