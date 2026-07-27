@@ -18,13 +18,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.json.JSONArray;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializable;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map; 
+import org.json.JSONArray; 
 
 @Path("/dashboard")
 public class Dashboard {
@@ -32,6 +27,9 @@ public class Dashboard {
 
     @Inject
     Template dashboard;
+
+    @Inject
+    Template dashboardLanding;
 
     public static List<String> generateTimeLabels(String startHour, String startMinute, 
                                                    int incrementMinutes, int count) {
@@ -52,16 +50,13 @@ public class Dashboard {
     public Response getDashboard() { 
         List<String> timings = generateTimeLabels("08", "00", 15, 15);
         Map<String, Object> data = new HashMap<>();
-         
         try {
-            // String timingsJson = mapper.writeValueAsString(timings);
             JSONArray arrJson = new JSONArray(timings);
             data.put("timings", arrJson);
         } catch (JsonException e) {
             e.printStackTrace();
             data.put("timings", "[]");
         }
-
         data.put("title", "Dashboard");
         data.put("username", "Admin User");
         data.put("lastLogin", "Today at 08:30 AM");
@@ -73,12 +68,22 @@ public class Dashboard {
         data.put("currentYear", LocalDateTime.now().getYear());
         data.put("version", "1.0.0"); 
         data.put("serverTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
         TemplateInstance template = dashboard.data(data);
         String html = template.render();
         return Response.ok(html).build();
     }
 
+    @Path("/landing")
+    @Produces(MediaType.TEXT_HTML)
+    public Response getDashboardIndex() {
+        Map<String, Object> data = new HashMap<>();
+        TemplateInstance template = dashboardLanding.data(data);
+        data.put("title", "Landing Dashboard");
+        String html = template.render();
+        return Response.ok(html).build();
+    }
+
+    /* contoh listing activity */
     private List<Activity> getRecentActivities() {
         return Arrays.asList(
                 new Activity("login", "John Doe", "08:15 AM"),
@@ -87,6 +92,8 @@ public class Dashboard {
                 new Activity("attendance", "Alice Brown", "08:45 AM"),
                 new Activity("login", "Charlie Wilson", "07:50 AM"));
     }
+
+
 
     public static class Activity {
         public String type;

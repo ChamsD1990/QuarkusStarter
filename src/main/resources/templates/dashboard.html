@@ -221,13 +221,24 @@
         }
 
         /* Chart container specific styles */
-        .chart-container {
+        .realtimeGraph {
             margin-bottom: 1px;
             position: relative;
             height: 75vh;
         }
 
-        .chart-container canvas {
+        .realtimeGraph canvas {
+            width: 100% !important;
+            height: 90% !important;
+        }
+
+        .summaryResult {
+            margin-bottom: 1px;
+            position: relative;
+            height: 75vh;
+        }
+
+        .summaryResult canvas {
             width: 100% !important;
             height: 90% !important;
         }
@@ -237,7 +248,7 @@
                 grid-template-columns: 1fr;
             }
 
-            .chart-container {
+            .realtimeGraph, .summaryResult {
                 height: 300px;
             }
         }
@@ -254,23 +265,27 @@
 
 <body>
     <div class="container"> 
-        <div class="header">
-            <h1>📊 {title}</h1>
-            <div class="subtitle">
-                Welcome back, <strong>{username}</strong>! Last login: {lastLogin}
+        <div class="header row">
+            <div class="col-md-11">
+                <h1>📊 {title}</h1>
+                <div class="subtitle">
+                    Welcome back, <strong>{username}</strong>! Last login: {lastLogin}
+                </div>
             </div>
-        </div> 
-        <div class="row">
-          <div class="col-md-6">
-            <div class="card chart-container">
-            <h3>📊 Weekly Attendance Overview</h3>
-            <canvas id="attendanceChart"></canvas>
+            <div class="col-md-1">
+                <a href="/dashboard/landing"><i class="fas fa-home"></i> Home</a>
             </div> 
+        </div>
+        <div class="row">
+          <div class="col-md-6"><div class="card realtimeGraph">
+            <h3>📊 Realtime Graph</h3>
+            <canvas id="LineChart"></canvas>
+        </div>
           </div>
-          <div class="col-md-6">
-            <div class="chart-container">
-              <canvas id="attendanceChart"></canvas>
-            </div>
+          <div class="col-md-6"><div class="card summaryResult">
+            <h3>📊 Summary Graph</h3>
+            <canvas id="attendanceChart"></canvas>
+        </div>
           </div>
         </div>
         <div class="footer">
@@ -358,27 +373,26 @@
             });
  
             
-            const ctxLine = document.getElementById('attendanceChart').getContext('2d');
-
-            new Chart(ctx, {
+            const ctxLine = document.getElementById('LineChart').getContext('2d');  
+            const ChartLine = new Chart(ctxLine, {
                 type: 'line',
                 data: {
                     labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
                     datasets: [{
                         label: 'Attendance',
                         data: [3000, 4000, 2000, 5000, 8000, 9000, 2000],
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        backgroundColor: 'rgba(255, 255, 255, 0)',
                         borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 3,
-                        tension: 0.3,
+                        tension: 0.4,
                         fill: true,
-                        pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                        pointBackgroundColor: 'rgba(54, 162, 235, 0)',
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 9
+                        pointRadius: 5,
+                        pointHoverRadius: 7
                     }]
-                },
+                },  
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -395,73 +409,13 @@
                                 }
                             }
                         },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            cornerRadius: 8,
-                            padding: 12,
-                            callbacks: {
-                                label: function (context) {
-                                    return `Attendance: ${context.parsed.y.toLocaleString()} people`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 10000,
-                            ticks: {
-                                stepSize: 1000,
-                                font: {
-                                    size: 12
-                                },
-                                callback: function (value) {
-                                    return value.toLocaleString();
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0,0,0,0.08)'
-                            },
-                            title: {
-                                display: true,
-                                text: 'Number of People',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 13
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: 'Day of Week',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
                     }
                 }
             });
 
             window.addEventListener('resize', function () {
-                myChart.resize();
-                ctxLine.resize();
+                myChart.resize(); 
+                ChartLine.resize();
             });
         });
     </script>
