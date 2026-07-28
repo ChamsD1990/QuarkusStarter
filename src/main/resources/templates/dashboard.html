@@ -415,7 +415,7 @@
             const secs = String(currentTime.getSeconds()).padStart(2, '0');
 
             document.getElementById('serverTime').textContent = year + "-"+ month + "-"+ day + " " + hrs + ":" + mins + ":" + secs;
-            document.getElementById('elapsedDisplay').textContent = " | Running: " + hours+ ":"+ minutes + ":"+ seconds;
+            document.getElementById('elapsedDisplay').textContent = " | Running: " + (hours*1)+ ":"+ (minutes*-1) + ":"+ (seconds*-1);
         }
 
         updateTimer();
