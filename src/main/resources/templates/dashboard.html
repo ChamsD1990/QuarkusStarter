@@ -413,14 +413,13 @@
         }
     }
 
-    const startTime = parseServerTime(serverTimeStr);
+    const startTime = new Date();
 
     function updateTimer() {
         const now = new Date();
 
         // Validasi startTime
-        if (!(startTime instanceof Date) || isNaN(startTime.getTime())) {
-            // Jika startTime invalid, gunakan waktu sekarang
+        if (!(startTime instanceof Date) || isNaN(startTime.getTime())) { 
             const fallback = now.toISOString().replace('T', ' ').slice(0, 19);
             document.getElementById('serverTime').textContent = fallback;
             document.getElementById('elapsedDisplay').textContent = " | Running: 00:00:00";
