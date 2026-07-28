@@ -415,7 +415,7 @@
         const secs = String(currentTime.getSeconds()).padStart(2, '0');
 
         document.getElementById('serverTime').textContent = year + "-" + month + "-" + day + " " + hrs + ":" + mins + ":" + secs;
-        // Remove the negative signs - just display the elapsed time as is
+        // IMPORTANT: Remove the *-1 multiplication
         document.getElementById('elapsedDisplay').textContent = " | Running: " + hours + ":" + minutes + ":" + seconds;
     }
 
