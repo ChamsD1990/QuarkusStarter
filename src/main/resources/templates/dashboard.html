@@ -16,7 +16,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             padding: 10px;
         }
@@ -27,288 +27,246 @@
         }
 
         .header {
-            background: white;
-            padding: 25px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
             border-radius: 12px;
             margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .header h1,
-        header .subtitle {
-            margin: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .header h1 {
-            color: #1a237e;
-            font-size: 28px;
-            margin-bottom: 5px;
-            }
-            /* 
-
-        .header .subtitle {
-            color: #666;
-            font-size: 14px;
-            text-align: left;
+            color: #fff;
+            font-size: 24px;
+            margin: 0;
         }
 
-        .header .subtitle strong {
-            color: #1a237e;
-        } */
+        .header h1 i {
+            color: #4CAF50;
+        }
+
+        .btn-exit {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-exit:hover {
+            background: #dc3545;
+            color: white;
+            transform: scale(1.05);
+        }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
             text-align: center;
+            transition: all 0.3s ease;
         }
 
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .stat-card .icon {
-            font-size: 30px;
-            margin-bottom: 10px;
+            transform: translateY(-3px);
+            border-color: rgba(76, 175, 80, 0.3);
         }
 
         .stat-card .number {
-            font-size: 36px;
+            font-size: 28px;
             font-weight: bold;
-            margin-bottom: 5px;
+            color: #fff;
         }
 
         .stat-card .label {
-            color: #666;
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .stat-card.primary .number {
-            color: #1976d2;
+        .stat-card .icon {
+            font-size: 20px;
+            margin-bottom: 5px;
         }
 
         .stat-card.success .number {
-            color: #388e3c;
-        }
-
-        .stat-card.warning .number {
-            color: #f57c00;
+            color: #4CAF50;
         }
 
         .stat-card.danger .number {
-            color: #d32f2f;
+            color: #f44336;
+        }
+
+        .stat-card.warning .number {
+            color: #ff9800;
         }
 
         .stat-card.info .number {
-            color: #0097a7;
+            color: #2196F3;
         }
 
         .content-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
+            margin-bottom: 20px;
         }
 
         .card {
-            background: white;
-            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .card h3 {
-            margin-bottom: 20px;
-            color: #333;
-            border-bottom: 2px solid #f0f2f5;
-            padding-bottom: 12px;
-            font-size: 18px;
-        }
-
-        .activity-item {
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f2f5;
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .activity-item:last-child {
-            border-bottom: none;
+        .card h3 .badge-status {
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
         }
 
-        .activity-item .time {
-            color: #999;
+        .card h3 .badge-status.running {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Tooltip Custom */
+        .chart-tooltip {
+            background: rgba(0, 0, 0, 0.9) !important;
+            border-radius: 8px !important;
+            padding: 12px !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .chart-tooltip .tooltip-title {
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .chart-tooltip .tooltip-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 2px 0;
             font-size: 12px;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
+        .chart-tooltip .tooltip-item .value {
             font-weight: bold;
-            text-transform: uppercase;
         }
 
-        .badge-login {
-            background: #e8f5e9;
-            color: #388e3c;
+        .chart-tooltip .tooltip-item .value.success {
+            color: #4CAF50;
         }
 
-        .badge-logout {
-            background: #fff3e0;
-            color: #f57c00;
+        .chart-tooltip .tooltip-item .value.danger {
+            color: #f44336;
         }
 
-        .badge-attendance {
-            background: #e1f5fe;
-            color: #0097a7;
+        .chart-tooltip .tooltip-item .value.warning {
+            color: #ff9800;
         }
 
-        .quick-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .quick-actions a {
-            display: block;
-            padding: 14px;
-            text-decoration: none;
-            border-radius: 8px;
+        .footer {
             text-align: center;
-            font-weight: 600;
-            transition: transform 0.2s;
+            margin-top: 10px;
+            padding: 12px 24px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            display: inline-block;
+            width: auto;
+            max-width: 95%;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            white-space: nowrap;
         }
 
-        .quick-actions a:hover {
-            transform: scale(1.02);
+        .footer #serverTime {
+            color: #4CAF50;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            background: rgba(76, 175, 80, 0.15);
+            padding: 2px 10px;
+            border-radius: 4px;
         }
 
-        .btn-primary {
-            background: #1976d2;
-            color: white;
+        .clock-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin: 0 6px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
         }
 
-        .btn-success {
-            background: #388e3c;
-            color: white;
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.2;
+            }
         }
 
-        .btn-warning {
-            background: #f57c00;
-            color: white;
-        }
-
-        .btn-info {
-            background: #0097a7;
-            color: white;
-        }
-
-.footer {
-    text-align: center;
-    margin-top: 10px;
-    padding: 12px 20px;
-    color: white;
-    font-size: 12px;
-    opacity: 0.9;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-    display: inline-block;  /* ← INLINE */
-    width: auto;            /* ← Lebar otomatis */
-    max-width: 95%;
-    margin-left: auto;
-    margin-right: auto;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    white-space: nowrap;    /* ← Biar ga turun ke bawah */
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Dot berkedip */
-.clock-dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    background: #4CAF50;
-    border-radius: 50%;
-    margin: 0 6px;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-}
-
-/* Warna highlight */
-.footer #serverTime {
-    padding: 2px;
-    background: white;
-    border: #e1f5fe;
-    border-radius: 5px;
-    color: #4CAF50;
-    font-weight: bold;
-    font-size: large;
-    font-family: 'Courier New', monospace;
-}
-
-.footer .elapsed {
-    color: #ff9800;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-}
-
-.footer .version-badge {
-    background: rgba(76, 175, 80, 0.3);
-    padding: 1px 8px;
-    border-radius: 10px;
-    font-weight: bold;
-    color: #4CAF50;
-}
-
-/* Responsive - kalo layar kecil jadi turun */
-@media (max-width: 600px) {
-    .footer {
-        white-space: normal;
-        font-size: 10px;
-        padding: 8px 12px;
-        display: block;
-        width: 95%;
-    }
-}
-
-        /* Chart container specific styles */
-        .realtimeGraph {
-            margin-bottom: 1px;
-            position: relative;
-            height: 75vh;
-        }
-
-        .realtimeGraph canvas {
-            width: 100% !important;
-            height: 90% !important;
-        }
-
-        .summaryResult {
-            margin-bottom: 1px;
-            position: relative;
-            height: 75vh;
-        }
-
-        .summaryResult canvas {
-            width: 100% !important;
-            height: 90% !important;
+        .footer .elapsed {
+            color: #ff9800;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
         }
 
         @media (max-width: 768px) {
@@ -316,204 +274,139 @@
                 grid-template-columns: 1fr;
             }
 
-            .realtimeGraph, .summaryResult {
-                height: 300px;
+            .footer {
+                white-space: normal;
+                font-size: 10px;
+                display: block;
+                width: 95%;
+                border-radius: 12px;
+            }
+
+            .chart-container {
+                height: 250px;
             }
         }
     </style>
-    <!-- Use correct Font Awesome version -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/cdbootstrap/js/cdb.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cdbootstrap/js/bootstrap.min.js"></script>
-    <!-- Load Chart.js first -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
-    <div class="container"> 
-        <div class="header row">
-            <div class="col-xs-10 col-sm-10 col-md-10 row">
-                <h1>📊 {title}</h1> 
-            </div> 
-            <div class="com-xs-2 col-sm-2 col-md-2 p-s0">
-                <button class="btn btn-xs btn-default">
+    <div class="container">
+        <!-- Header -->
+        <div class="header row align-items-center">
+            <div class="col-md-6">
+                <h1><i class="fas fa-chart-line"></i> {title}</h1>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn-exit" id="btnLogout">
                     <i class="fas fa-sign-out-alt"></i> Exit
                 </button>
             </div>
         </div>
-        <div class="row">
-          <div class="col-md-6"><div class="card realtimeGraph">
-            <h3>📊 Realtime Graph</h3>
-            <canvas id="LineChart"></canvas>
+
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card success">
+                <div class="icon">✅</div>
+                <div class="number" id="totalSuccess">0</div>
+                <div class="label">Success</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="icon">❌</div>
+                <div class="number" id="totalError">0</div>
+                <div class="label">Error</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="icon">⚠️</div>
+                <div class="number" id="totalWarning">0</div>
+                <div class="label">Warning</div>
+            </div>
+            <div class="stat-card info">
+                <div class="icon">📊</div>
+                <div class="number" id="totalJobs">0</div>
+                <div class="label">Total Jobs</div>
+            </div>
         </div>
-          </div>
-          <div class="col-md-6"><div class="card summaryResult">
-            <h3>📊 Summary Graph</h3>
-            <canvas id="attendanceChart"></canvas>
+
+        <!-- Charts -->
+        <div class="content-grid">
+            <!-- Chart 1: Realtime (incremental every 10s) -->
+            <div class="card">
+                <h3>
+                    <span><i class="fas fa-sync fa-spin" style="color:#4CAF50;"></i> Realtime Graph</span>
+                    <span class="badge-status running" id="liveStatus">● LIVE</span>
+                </h3>
+                <div class="chart-container">
+                    <canvas id="realtimeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Summary -->
+            <div class="card">
+                <h3>
+                    <span><i class="fas fa-chart-bar" style="color:#2196F3;"></i> Summary Graph</span>
+                    <span class="badge-status" id="summaryStatus">● Summary</span>
+                </h3>
+                <div class="chart-container">
+                    <canvas id="summaryChart"></canvas>
+                </div>
+            </div>
         </div>
-          </div>
-        </div>
+
+        <!-- Footer -->
         <div class="footer">
-            © <span id="currentYear"></span> Attendance System v<span id="version"></span> |
+            © <span id="currentYear"></span> Attendance System v<span id="version">1.0.0</span> |
             Server Time: <span id="serverTime"></span>
             <span class="clock-dot"></span>
             <span id="elapsedDisplay">| Running: 00:00:00</span>
         </div>
     </div>
 
-  <script> 
-    document.addEventListener('DOMContentLoaded', function () {
-            const dataText = "{timings}"; 
-            const parser = new DOMParser();
-            const decoded = parser.parseFromString(dataText, 'text/html').body.textContent;
-            const timingsArray = JSON.parse(decoded);
-            console.log(timingsArray);
-            
-            const ctx = document.getElementById('attendanceChart').getContext('2d'); 
-            const myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-                    datasets: [{
-                        label: 'Attendance',
-                        data: [3000, 4000, 2000, 5000, 8000, 9000, 2000],
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            cornerRadius: 8,
-                            padding: 12
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1000,
-                                font: {
-                                    size: 12
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0,0,0,0.05)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    }
-                }
-            });
- 
-            
-            const ctxLine = document.getElementById('LineChart').getContext('2d');  
-            const ChartLine = new Chart(ctxLine, {
-                type: 'line',
-                data: {
-                    labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-                    datasets: [{
-                        label: 'Attendance',
-                        data: [3000, 4000, 2000, 5000, 8000, 9000, 2000],
-                        backgroundColor: 'rgba(255, 255, 255, 0)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: 'rgba(54, 162, 235, 0)',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7
-                    }]
-                },  
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20,
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            }
-                        },
-                    }
-                }
-            });
-      const startServer = "{serverTime}"; 
+    <script>
+        // ============================================================
+        // 1. LOGOUT
+        // ============================================================
+        document.getElementById('btnLogout').addEventListener("click", function (e) {
+            console.log("Logout button clicked!", e);
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
+                window.location.href = '/login';
+            }
+        });
 
-        // Fungsi parse string ke Date object
+        // ============================================================
+        // 2. FOOTER CLOCK
+        // ============================================================
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        const startServer = "{serverTime}" || new Date().toISOString().replace('T', ' ').slice(0, 19);
+
         function parseServerTime(dateStr) {
             const parts = dateStr.split(' ');
             const dateParts = parts[0].split('-');
             const timeParts = parts[1].split(':');
-
             return new Date(
-                parseInt(dateParts[0]),      // year
-                parseInt(dateParts[1]) - 1,  // month (0-based)
-                parseInt(dateParts[2]),      // day
-                parseInt(timeParts[0]),      // hours
-                parseInt(timeParts[1]),      // minutes
-                parseInt(timeParts[2])       // seconds
+                parseInt(dateParts[0]),
+                parseInt(dateParts[1]) - 1,
+                parseInt(dateParts[2]),
+                parseInt(timeParts[0]),
+                parseInt(timeParts[1]),
+                parseInt(timeParts[2])
             );
         }
 
-        // Waktu awal
         const startTime = parseServerTime(startServer);
+
         function updateTimer() {
             const now = new Date();
-            const elapsed = Math.floor((now - startTime) / 1000); // detik yang berlalu
-
-            // Hitung selisih waktu
+            const elapsed = Math.floor((now - startTime) / 1000);
             const hours = String(Math.floor(elapsed / 3600)).padStart(2, '0');
             const minutes = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
             const seconds = String(elapsed % 60).padStart(2, '0');
 
-            // Format waktu saat ini (startServer + elapsed)
             const currentTime = new Date(startTime.getTime() + elapsed * 1000);
-
             const year = currentTime.getFullYear();
             const month = String(currentTime.getMonth() + 1).padStart(2, '0');
             const day = String(currentTime.getDate()).padStart(2, '0');
@@ -521,23 +414,299 @@
             const mins = String(currentTime.getMinutes()).padStart(2, '0');
             const secs = String(currentTime.getSeconds()).padStart(2, '0');
 
-            const formattedTime = ""+year+"-"+month+"-"+day+" "+hrs+":"+ mins+":"+secs+"";
-            const elapsedFormatted = hours+":"+minutes+":"+seconds;
-
-            // Update DOM
-            document.getElementById('serverTime').textContent = formattedTime;
-            document.getElementById('elapsedDisplay').textContent = elapsedFormatted;
+            document.getElementById('serverTime').textContent = year + "-"+ month + "-"+ day + " " + hrs + ":" + mins + ":" + secs;
+            document.getElementById('elapsedDisplay').textContent = " | Running: " + hours+ ":"+ minutes + ":"+ seconds;
         }
 
-        // Jalankan pertama kali
-
+        updateTimer();
         setInterval(updateTimer, 1000);
-            window.addEventListener('resize', function () {
-                updateTimer();
-                myChart.resize(); 
-                ChartLine.resize();
-            });
+
+        // ============================================================
+        // 3. GENERATE RANDOM DATA (simulasi job)
+        // ============================================================
+        function generateJobData() {
+            const statuses = ['success', 'error', 'warning'];
+            const weights = [0.7, 0.15, 0.15];
+            let r = Math.random();
+            let sum = 0;
+            for (let i = 0; i < weights.length; i++) {
+                sum += weights[i];
+                if (r <= sum) return statuses[i];
+            }
+            return 'success';
+        }
+
+        // ============================================================
+        // 4. CHART 1: REALTIME (incremental every 10s)
+        // ============================================================
+        const realtimeCtx = document.getElementById('realtimeChart').getContext('2d');
+        let realtimeLabels = [];
+        let successData = [];
+        let errorData = [];
+        let warningData = [];
+
+        // Inisialisasi dengan data awal
+        for (let i = 0; i < 10; i++) {
+            const time = new Date(Date.now() - (10 - i) * 10000);
+            realtimeLabels.push(time.toLocaleTimeString());
+            successData.push(Math.floor(Math.random() * 20) + 5);
+            errorData.push(Math.floor(Math.random() * 5));
+            warningData.push(Math.floor(Math.random() * 5));
+        }
+
+        const realtimeChart = new Chart(realtimeCtx, {
+            type: 'line',
+            data: {
+                labels: realtimeLabels,
+                datasets: [{
+                    label: '✅ Success',
+                    data: successData,
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#4CAF50'
+                }, {
+                    label: '❌ Error',
+                    data: errorData,
+                    borderColor: '#f44336',
+                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#f44336'
+                }, {
+                    label: '⚠️ Warning',
+                    data: warningData,
+                    borderColor: '#ff9800',
+                    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#ff9800'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#fff',
+                            usePointStyle: true,
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        cornerRadius: 8,
+                        padding: 12,
+                        callbacks: {
+                            afterBody: function (tooltipItems) {
+                                let total = 0;
+                                tooltipItems.forEach(item => {
+                                    total += item.parsed.y;
+                                });
+                                return "📊 Total: "+ total;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: 'rgba(255,255,255,0.6)', maxTicksLimit: 15 },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: 'rgba(255,255,255,0.6)', stepSize: 5 },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
         });
+
+        // ============================================================
+        // 5. CHART 2: SUMMARY (from dataText)
+        // ============================================================
+        const summaryCtx = document.getElementById('summaryChart').getContext('2d');
+
+        // Parse timings from server
+        let summaryLabels = [];
+        let summaryData = [];
+
+        try {
+            const dataText = "{timings}";
+            const parser = new DOMParser();
+            const decoded = parser.parseFromString(dataText, 'text/html').body.textContent;
+            summaryLabels = JSON.parse(decoded);
+            console.log('📊 Summary Labels:', summaryLabels);
+        } catch (e) {
+            summaryLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            console.warn('Using default labels');
+        }
+
+        // Generate summary data
+        summaryData = summaryLabels.map(() => Math.floor(Math.random() * 8000) + 2000);
+
+        const summaryChart = new Chart(summaryCtx, {
+            type: 'bar',
+            data: {
+                labels: summaryLabels,
+                datasets: [{
+                    label: '📊 Attendance',
+                    data: summaryData,
+                    backgroundColor: summaryData.map(v => {
+                        if (v > 7000) return 'rgba(76, 175, 80, 0.7)';
+                        if (v > 4000) return 'rgba(33, 150, 243, 0.7)';
+                        return 'rgba(255, 152, 0, 0.7)';
+                    }),
+                    borderColor: summaryData.map(v => {
+                        if (v > 7000) return '#4CAF50';
+                        if (v > 4000) return '#2196F3';
+                        return '#ff9800';
+                    }),
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    barPercentage: 0.6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#fff',
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        cornerRadius: 8,
+                        padding: 12,
+                        callbacks: {
+                            label: function (context) {
+                                return "Attendance: "+context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: 'rgba(255,255,255,0.6)' },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: 'rgba(255,255,255,0.6)', stepSize: 1000 },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    }
+                }
+            }
+        });
+
+        // ============================================================
+        // 6. UPDATE REALTIME CHART EVERY 10 SECONDS
+        // ============================================================
+        function updateRealtimeChart() {
+            const now = new Date();
+            const timeLabel = now.toLocaleTimeString();
+
+            // Generate new job data
+            const success = Math.floor(Math.random() * 15) + 5;
+            const error = Math.floor(Math.random() * 8);
+            const warning = Math.floor(Math.random() * 6);
+
+            // Add new data
+            realtimeLabels.push(timeLabel);
+            successData.push(success);
+            errorData.push(error);
+            warningData.push(warning);
+
+            // Keep only last 20 points
+            if (realtimeLabels.length > 20) {
+                realtimeLabels.shift();
+                successData.shift();
+                errorData.shift();
+                warningData.shift();
+            }
+
+            // Update chart
+            realtimeChart.data.labels = realtimeLabels;
+            realtimeChart.data.datasets[0].data = successData;
+            realtimeChart.data.datasets[1].data = errorData;
+            realtimeChart.data.datasets[2].data = warningData;
+            realtimeChart.update('none');
+
+            // Update stats
+            updateStats(success, error, warning);
+
+            console.log("📊 Update: ✅"+success+" ❌"+error+" ⚠️"+warning);
+        }
+
+        // ============================================================
+        // 7. UPDATE STATS
+        // ============================================================
+        let totalSuccess = 0,
+            totalError = 0,
+            totalWarning = 0;
+
+        function updateStats(s, e, w) {
+            totalSuccess += s;
+            totalError += e;
+            totalWarning += w;
+
+            document.getElementById('totalSuccess').textContent = totalSuccess;
+            document.getElementById('totalError').textContent = totalError;
+            document.getElementById('totalWarning').textContent = totalWarning;
+            document.getElementById('totalJobs').textContent = totalSuccess + totalError + totalWarning;
+        }
+
+        // Inisialisasi stats
+        updateStats(0, 0, 0);
+
+        // ============================================================
+        // 8. START REALTIME UPDATES
+        // ============================================================
+        // Update every 10 seconds
+        setInterval(updateRealtimeChart, 10000);
+
+        // Update status indicator
+        setInterval(() => {
+            const status = document.getElementById('liveStatus');
+            status.style.opacity = status.style.opacity === '0.3' ? '1' : '0.3';
+        }, 1000);
+
+        // ============================================================
+        // 9. RESIZE HANDLER
+        // ============================================================
+        window.addEventListener('resize', function () {
+            realtimeChart.resize();
+            summaryChart.resize();
+        });
+
+        // ============================================================
+        // 10. TOOLTIP CUSTOM - Show list on hover
+        // ============================================================
+        // Chart.js already shows tooltips with all datasets
+        // The tooltip will show Success, Error, Warning values
+
+        console.log('✅ Dashboard initialized!');
+        console.log('📊 Realtime chart updates every 10 seconds');
+        console.log('📊 Summary chart loaded');
     </script>
 </body>
 

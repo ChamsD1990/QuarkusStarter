@@ -230,14 +230,10 @@ public class AuthDataSecure {
     }
  
     private UserCredential getUserFromDatabase(String username) throws SQLException {
-        String sql = "SELECT * FROM users WHERE username = ?";
-
-        try (Connection conn = SQLiteHelper.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+        String sql = "SELECT * FROM users WHERE username = ?"; 
+        try (Connection conn = SQLiteHelper.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) { 
             pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
-
+            ResultSet rs = pstmt.executeQuery(); 
             if (rs.next()) {
                 return new UserCredential(
                         rs.getString("salt"),
@@ -324,7 +320,6 @@ public class AuthDataSecure {
         }
     }
 
-    // ==================== CHANGE PASSWORD ====================
     public Response changePassword(String username, String oldPassword, String newPassword) {
         // Validasi input
         if (username == null || username.trim().isEmpty()) {
@@ -412,7 +407,6 @@ public class AuthDataSecure {
         }
     }
 
-    // ==================== UNLOCK ACCOUNT ====================
     public void unlockAccount(String username) {
         String sql = "UPDATE users SET is_locked = 0, locked_until = NULL WHERE username = ?";
 
@@ -429,7 +423,6 @@ public class AuthDataSecure {
         }
     }
 
-    // ==================== RECORD FAILED ATTEMPT ====================
     private void recordFailedAttempt(String username) {
         FailedLoginAttempt attempt = failedAttempts.computeIfAbsent(username, k -> new FailedLoginAttempt());
 
@@ -447,7 +440,6 @@ public class AuthDataSecure {
         }
     }
 
-    // ==================== LOCK ACCOUNT ====================
     private void lockAccount(String username) {
         String sql = "UPDATE users SET is_locked = 1, locked_until = ? WHERE username = ?";
         Instant lockedUntil = Instant.now().plusSeconds(lockoutDurationMinutes * 60);
@@ -464,7 +456,6 @@ public class AuthDataSecure {
         }
     }
 
-    // ==================== USER EXISTS ====================
     public boolean userExists(String username) {
         String sql = "SELECT 1 FROM users WHERE username = ?";
 
@@ -481,7 +472,6 @@ public class AuthDataSecure {
         }
     }
 
-    // ==================== GET USER COUNT ====================
     public Response getUserCount() {
         String sql = "SELECT COUNT(*) FROM users";
 
@@ -506,7 +496,6 @@ public class AuthDataSecure {
         }
     }
 
-    // ==================== DELETE USER ====================
     public Response deleteUser(String username) {
         String sql = "DELETE FROM users WHERE username = ?";
 
@@ -534,7 +523,6 @@ public class AuthDataSecure {
         }
     }
 
-    // ==================== GET USER INFO ====================
     public Response getUserInfo(String username) {
         try {
             UserCredential user = getUserFromDatabase(username);
@@ -563,7 +551,6 @@ public class AuthDataSecure {
         }
     }
 
-    // ==================== CLEAR DATABASE ====================
     public Response clearDatabase() {
         String sql = "DELETE FROM users";
 
@@ -609,20 +596,13 @@ public class AuthDataSecure {
         return Base64.getEncoder().encodeToString(saltBytes);
     }
 
-    private String hashPassword(String password, String salt)
-            throws NoSuchAlgorithmException {
+    private String hashPassword(String password, String salt) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        
-        // PASTIKAN URUTANNYA SAMA!
-        String saltedPassword = salt + password; // SALT + PASSWORD
-        // ATAU
-        // String saltedPassword = password + salt; // PASSWORD + SALT
-        
+        String saltedPassword = salt + password;
         byte[] hashedBytes = md.digest(saltedPassword.getBytes(StandardCharsets.UTF_8));
         return Base64.getEncoder().encodeToString(hashedBytes);
     }
-
-
+ 
     private void printUserData(String username) {
         try {
             UserCredential user = getUserFromDatabase(username);
