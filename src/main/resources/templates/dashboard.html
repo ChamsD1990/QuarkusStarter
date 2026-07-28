@@ -379,15 +379,22 @@
         // ============================================================
         // 2. FOOTER CLOCK
         // ============================================================
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        const startServer = "{serverTime}" || new Date().toISOString().replace('T', ' ').slice(0, 19);
+    // Perbaiki: cek apakah {serverTime} benar-benar diganti oleh server
+    let serverTimeStr = "{serverTime}";
+    // Jika masih berupa template literal (belum diganti), gunakan fallback
+    if (serverTimeStr === "{serverTime}" || serverTimeStr === "" || serverTimeStr === "undefined") {
+        serverTimeStr = new Date().toISOString().replace('T', ' ').slice(0, 19);
+        console.warn("⚠️ Using client time as fallback");
+    }
 
-        function parseServerTime(dateStr) {
+    function parseServerTime(dateStr) {
+        try {
             const parts = dateStr.split(' ');
             const dateParts = parts[0].split('-');
             const timeParts = parts[1].split(':');
-            return new Date(
+            const date = new Date(
                 parseInt(dateParts[0]),
                 parseInt(dateParts[1]) - 1,
                 parseInt(dateParts[2]),
@@ -395,13 +402,40 @@
                 parseInt(timeParts[1]),
                 parseInt(timeParts[2])
             );
+            // Validasi hasil parse
+            if (isNaN(date.getTime())) {
+                throw new Error("Invalid date");
+            }
+            return date;
+        } catch (e) {
+            console.error("Error parsing date, using current time:", e);
+            return new Date(); // Fallback ke waktu sekarang
         }
+    }
 
-        const startTime = parseServerTime(startServer);
+    const startTime = parseServerTime(serverTimeStr);
 
     function updateTimer() {
         const now = new Date();
+
+        // Validasi startTime
+        if (!(startTime instanceof Date) || isNaN(startTime.getTime())) {
+            // Jika startTime invalid, gunakan waktu sekarang
+            const fallback = now.toISOString().replace('T', ' ').slice(0, 19);
+            document.getElementById('serverTime').textContent = fallback;
+            document.getElementById('elapsedDisplay').textContent = " | Running: 00:00:00";
+            return;
+        }
+
         const elapsed = Math.floor((now - startTime) / 1000);
+
+        // Validasi elapsed
+        if (isNaN(elapsed) || elapsed < 0) {
+            document.getElementById('serverTime').textContent = now.toISOString().replace('T', ' ').slice(0, 19);
+            document.getElementById('elapsedDisplay').textContent = " | Running: 00:00:00";
+            return;
+        }
+
         const hours = String(Math.floor(elapsed / 3600)).padStart(2, '0');
         const minutes = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
         const seconds = String(elapsed % 60).padStart(2, '0');
@@ -415,9 +449,9 @@
         const secs = String(currentTime.getSeconds()).padStart(2, '0');
 
         document.getElementById('serverTime').textContent = year + "-" + month + "-" + day + " " + hrs + ":" + mins + ":" + secs;
-        // IMPORTANT: Remove the *-1 multiplication
         document.getElementById('elapsedDisplay').textContent = " | Running: " + hours + ":" + minutes + ":" + seconds;
     }
+ 
 
         updateTimer();
         setInterval(updateTimer, 1000);
